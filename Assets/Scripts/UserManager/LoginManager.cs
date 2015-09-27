@@ -8,11 +8,12 @@ using Parse;
 using System.Threading.Tasks;
 
 public class LoginManager : MonoBehaviour {
-
-    public Text info;
-    public Text username;
-    public Text password;
-    public RawImage avatar;
+  
+    public InputField username;
+    public InputField password;
+    public Text txtInfo;
+    public GameObject loginPanel;
+    public GameObject signUpPanel;
     
     void Awake()
     {
@@ -20,6 +21,15 @@ public class LoginManager : MonoBehaviour {
        {
            Debug.Log("Init done!");
        });
+
+        if (ParseUser.CurrentUser != null)
+        {
+            ParseUser.LogOut();
+        }
+        else
+        {
+
+        }
     }
 
     // Use this for initialization
@@ -77,12 +87,11 @@ public class LoginManager : MonoBehaviour {
                     if (userProfile["facebookId"] != "")
                     {
                         userProfile["pictureURL"] = "https://graph.facebook.com/" + userProfile["facebookId"] + "/picture?type=large&return_ssl_resources=1";
-                    }
-                    info.text = userProfile["name"];
+                    }                  
 
                     StartCoroutine("saveUserProfile", userProfile);
 
-                    StartCoroutine("UpdateProfilePictureTexture", userProfile["pictureURL"]);
+                    //StartCoroutine("UpdateProfilePictureTexture", userProfile["pictureURL"]);
                 });
 
             }
@@ -94,7 +103,7 @@ public class LoginManager : MonoBehaviour {
         string url = pictureURL + "&access_token=" + FB.AccessToken; ;
         WWW www = new WWW(url);
         yield return www;
-        avatar.texture = www.texture;
+        //avatar.texture = www.texture;
     }
 
     private IEnumerator saveUserProfile(Dictionary<string, string> profile)
@@ -130,41 +139,36 @@ public class LoginManager : MonoBehaviour {
             if (t.IsFaulted || t.IsCanceled)
             {
                 Debug.Log(" The login failed. Check the error to see why.");
+                txtInfo.text = GameConsts.Instance.STRING_LOGIN_FAIL;
             }
             else
             {
-                Debug.Log("Login was successful.");                
+                Debug.Log("Login was successful.");                             
             }
         });
     }
 
-    public void ParseSignUp()
+    public void ShowSignUpScreen()
     {
         if (ParseUser.CurrentUser != null)
         {
-            ParseUser.LogOut();
-        }
-        else
-        {
-            
-        }
-
-        if (username.text != "" && username.text != "Username" && password.text != "")
-        {
-            var user = new ParseUser()
+            ParseUser.LogOutAsync().ContinueWith(t =>
             {
-                Username = username.text,
-                Password = password.text,
-                Email = "test@abc.com"
-            };
-
-            Task signUpTask = user.SignUpAsync();
+                if (t.IsFaulted || t.IsCanceled)
+                {
+                    Debug.Log("Logout failed!");
+                }
+                else
+                {
+                    loginPanel.SetActive(false);
+                    signUpPanel.SetActive(true);
+                }
+            });
         }
         else
         {
-            Debug.Log("");
+            loginPanel.SetActive(false);
+            signUpPanel.SetActive(true);
         }
-        Debug.Log("Sign Up Click: " + username.text);
-
     }
 }
