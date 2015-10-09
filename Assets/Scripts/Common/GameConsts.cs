@@ -21,5 +21,6 @@ public class GameConsts {
     public readonly string STRING_LOGIN_FAIL = "Your username or password incorrect!";
     public readonly string STRING_SIGN_UP_FAIL = "Sign up fail!";
     public readonly string STRING_SIGN_UP_SUCCESS = "Sign up success!";
-    
+
+    public readonly float TIME_COUNT_DOWN_TO_PLAY = 3.0f;
 }

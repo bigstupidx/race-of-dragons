@@ -152,4 +152,14 @@ public class GameUtils {
         }
         return false;
     }
+
+    public float DegreeToRadian(float d)
+    {
+        return d * Mathf.PI / 180.0f;
+    }
+
+    public float RadianToDegree(float r)
+    {
+        return r * 180.0f / Mathf.PI;
+    }
 }
