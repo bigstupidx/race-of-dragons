@@ -8,7 +8,7 @@ public abstract class IState<T>
 
     public IState() { }
 
-    internal void setMachineAndContext(StateMachine<T> machine, T context)
+    internal void SetMachineAndContext(StateMachine<T> machine, T context)
     {
         this.machine = machine;
         this.context = context;
@@ -18,14 +18,14 @@ public abstract class IState<T>
     public virtual void onInitialized()
     { }
 
-    public virtual void begin()
+    public virtual void Begin()
     { }
 
-    public virtual void reason()
+    public virtual void Reason()
     { }
 
-    public abstract void update(float deltaTime);
+    public abstract void Update(float deltaTime);
 
-    public virtual void end()
+    public virtual void End()
     { }
 }

@@ -23,4 +23,6 @@ public class GameConsts {
     public readonly string STRING_SIGN_UP_SUCCESS = "Sign up success!";
 
     public readonly float TIME_COUNT_DOWN_TO_PLAY = 3.0f;
+
+    public readonly float PLAYER_SPEED_ANGLE_DEFAULT = 7.0f;
 }

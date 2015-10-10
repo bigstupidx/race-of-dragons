@@ -38,20 +38,20 @@ public sealed class StateMachine<T>
 
         AddState(initialState);
         currentState = initialState;
-        currentState.begin();
+        currentState.Begin();
     }
 
     public void AddState(IState<T> state)
     {
-        state.setMachineAndContext(this, context);
+        state.SetMachineAndContext(this, context);
         dicStates[state.GetType()] = state;
     }
 
-    public void update(float deltaTime)
+    public void Update(float deltaTime)
     {
         elapsedTimeInState += deltaTime;
-        currentState.reason();
-        currentState.update(deltaTime);
+        currentState.Reason();
+        currentState.Update(deltaTime);
     }
 
     public R ChangeState<R>() where R : IState<T>
@@ -62,7 +62,7 @@ public sealed class StateMachine<T>
             return currentState as R;
 
         if (currentState != null)
-            currentState.end();
+            currentState.End();
 
 #if UNITY_EDITOR
         // do a sanity check while in the editor to ensure we have the given state in our state list
@@ -76,7 +76,7 @@ public sealed class StateMachine<T>
 
         previousState = currentState;
         currentState = dicStates[newType];
-        currentState.begin();
+        currentState.Begin();
         elapsedTimeInState = 0.0f;
 
         if (onStateChanged != null)

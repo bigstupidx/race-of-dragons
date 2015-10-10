@@ -98,6 +98,7 @@ public class RandomMatchMaker : Photon.PunBehaviour
     {
         Debug.Log("OnJoinedRoom");
         joined = true;
+        
     }
 
 
@@ -105,7 +106,7 @@ public class RandomMatchMaker : Photon.PunBehaviour
     {
         ErrorDialog = "Error: Can't join random room (none found).";
         Debug.Log("OnPhotonRandomJoinFailed got called. Happens if no room is available (or all full or invisible or closed). JoinrRandom filter-options can limit available rooms.");
-        PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 4 }, TypedLobby.Default);
+        PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 1 }, TypedLobby.Default);
     }
 
     public override void OnCreatedRoom()
@@ -137,7 +138,8 @@ public class RandomMatchMaker : Photon.PunBehaviour
                 {
                     PhotonNetwork.room.visible = false;
                     Debug.Log("TEST: " + timeCountDown);
-                    Application.LoadLevel(1);
+                    if (PhotonNetwork.isMasterClient)
+                        PhotonNetwork.LoadLevel("Scene_Game");
                     timeCountDown = 0;
                 }
             }

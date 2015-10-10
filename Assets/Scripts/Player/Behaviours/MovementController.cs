@@ -100,7 +100,7 @@ public class MovementController : MonoBehaviour {
 
         if (state == PLayerState.Falling)
         {
-            body.gravityScale = 1;
+            body.gravityScale = 0.1f;
         }
         else if (state == PLayerState.Flying)
         {

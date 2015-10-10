@@ -162,4 +162,12 @@ public class GameUtils {
     {
         return r * 180.0f / Mathf.PI;
     }
+
+    public float CaculateAlpha(float x, float y)
+    {
+        float result = Mathf.Atan2(y, x);
+        result = RadianToDegree(result);
+
+        return result;
+    }
 }
