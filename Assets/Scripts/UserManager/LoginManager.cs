@@ -116,6 +116,7 @@ public class LoginManager : MonoBehaviour {
             var saveTask = user.SaveAsync();
             while (!saveTask.IsCompleted) yield return null;            
         }
+        Debug.Log("Login was successful.");
     }
 
 
@@ -134,7 +135,7 @@ public class LoginManager : MonoBehaviour {
 
     public void ParseLogin()
     {
-        ParseUser.LogInAsync(username.text, password.text).ContinueWith(t =>
+        Task task = ParseUser.LogInAsync(username.text, password.text).ContinueWith(t =>
         {
             if (t.IsFaulted || t.IsCanceled)
             {
@@ -143,9 +144,16 @@ public class LoginManager : MonoBehaviour {
             }
             else
             {
-                Debug.Log("Login was successful.");                             
+                Debug.Log("Login was successful.");                              
             }
         });
+        StartCoroutine(ChangeScene(task));
+    }
+
+    private IEnumerator ChangeScene(Task t)
+    {
+        while (!t.IsCompleted) yield return null;
+        Application.LoadLevel(GameConsts.Instance.LEVEL_WAITING_NAME);
     }
 
     public void ShowSignUpScreen()

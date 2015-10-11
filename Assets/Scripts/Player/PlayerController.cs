@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    private float CaculateAlpha(float x, float y)
+    private float CalculateAlpha(float x, float y)
     {
         float result = Mathf.Atan2(y, x);
         result = GameUtils.Instance.RadianToDegree(result);
@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
         if (!controlable)
             return;
         Camera.main.transform.position = new Vector3(transform.position.x, 0, Camera.main.transform.position.z);
-        alpha = CaculateAlpha(body.velocity.x, body.velocity.y);
+        alpha = CalculateAlpha(body.velocity.x, body.velocity.y);
         transform.rotation = Quaternion.Euler(0, 0, alpha);
 
         stateMachine.Update(Time.deltaTime);

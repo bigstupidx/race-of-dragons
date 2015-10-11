@@ -8,12 +8,12 @@ using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class RandomMatchMaker : Photon.PunBehaviour
-{
-    public GUISkin skin;
-    public Vector2 widthAndHeight = new Vector2(600, 400);
+public class RandomMatchMaker : Photon.MonoBehaviour
+{        
     public TextMesh textCountDown;
-
+    public Transform playerPrefab;
+    public Transform[] cardHolders;
+  
     private bool connectFailed = false;
     private bool joined = false;
 
@@ -37,8 +37,23 @@ public class RandomMatchMaker : Photon.PunBehaviour
         }
     }
 
+    private void AlignListCardHolder()
+    {
+        float pos_Y = GameConsts.Instance.SCREEN_DESIGN_DEFAULT_HEIGHT * 0.1f * 0.01f;
+        float offset_X = GameConsts.Instance.SCREEN_DESIGN_DEFAULT_WIDTH * 0.25f * 0.01f;
+        float pos_X = 0;
+        float firstPosX = -GameConsts.Instance.SCREEN_DESIGN_DEFAULT_WIDTH * 0.5f * 0.01f + offset_X * 0.5f;
+
+        for (int i = 0; i < cardHolders.Length; i++)
+        {
+            pos_X = firstPosX + offset_X * i;
+            cardHolders[i].transform.position = new Vector3(pos_X, pos_Y, cardHolders[i].transform.position.z);
+        }
+    }
+
     public void Awake()
     {
+        AlignListCardHolder();
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
         PhotonNetwork.automaticallySyncScene = true;
 
@@ -62,19 +77,7 @@ public class RandomMatchMaker : Photon.PunBehaviour
 
     public void OnGUI()
     {
-        if (this.skin != null)
-        {
-            GUI.skin = this.skin;
-        }
         GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
-        
-        if (PhotonNetwork.room != null)
-        {
-            GUILayout.Label(PhotonNetwork.room.playerCount.ToString());
-        }
-        GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
-
-        GUILayout.Space(15);
 
         if (!string.IsNullOrEmpty(ErrorDialog))
         {
@@ -89,40 +92,70 @@ public class RandomMatchMaker : Photon.PunBehaviour
 
     }
 
-    public override void OnJoinedLobby()
+    public void OnJoinedLobby()
     {
         PhotonNetwork.JoinRandomRoom();
     }
 
-    public override void OnJoinedRoom()
+    public void OnJoinedRoom()
     {
         Debug.Log("OnJoinedRoom");
         joined = true;
-        
+        GameObject player = PhotonNetwork.Instantiate(playerPrefab.name, cardHolders[PhotonNetwork.playerList.Length - 1].position, Quaternion.identity, 0);
+        for (int i = 0; i < PhotonNetwork.playerList.Length; i++)
+        {
+            PhotonView.Find(PhotonNetwork.playerList[i].ID).transform.position = cardHolders[i].position;
+        }
     }
 
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+        Debug.Log("AAAA");
+    }
+
+    public void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
+    {
+        PhotonView.Find(newPlayer.ID).transform.position = cardHolders[PhotonNetwork.playerList.Length - 1].position;
+    }
+
+    public void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer)
+    {
+    }
 
     public void OnPhotonRandomJoinFailed()
     {
         ErrorDialog = "Error: Can't join random room (none found).";
         Debug.Log("OnPhotonRandomJoinFailed got called. Happens if no room is available (or all full or invisible or closed). JoinrRandom filter-options can limit available rooms.");
-        PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 1 }, TypedLobby.Default);
+        PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 3 }, TypedLobby.Default);
     }
 
-    public override void OnCreatedRoom()
+    public void OnCreatedRoom()
     {
         Debug.Log("OnCreatedRoom");
     }
 
-    public override void OnDisconnectedFromPhoton()
+    public void OnDisconnectedFromPhoton()
     {
-        Debug.Log("Disconnected from Photon.");
+        Debug.Log("Disconnected from Photon.");       
     }
 
     public void OnFailedToConnectToPhoton(object parameters)
     {
         this.connectFailed = true;
         Debug.Log("OnFailedToConnectToPhoton. StatusCode: " + parameters + " ServerAddress: " + PhotonNetwork.networkingPeer.ServerAddress);
+    }
+
+    public void OnMasterClientSwitched(PhotonPlayer player)
+    {
+        
+    }
+
+    public void OnLeftRoom()
+    {
+        Debug.Log("OnLeftRoom (local)");
+        
+        // back to main menu        
+        //Application.LoadLevel(WaitingMenu.SceneNameMenu);
     }
 
     void Update()

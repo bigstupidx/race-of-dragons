@@ -14,7 +14,7 @@ public class PlayerFlyState : IState<PlayerController>
         
     }
 
-    private Vector2 CaculateForce(float speed, float a)
+    private Vector2 CalculateForce(float speed, float a)
     {
         a = GameUtils.Instance.DegreeToRadian(a);
         Vector2 result = new Vector2();
@@ -41,8 +41,8 @@ public class PlayerFlyState : IState<PlayerController>
 
     public override void Update(float deltaTime)
     {
-        alpha = GameUtils.Instance.CaculateAlpha(body.velocity.x, body.velocity.y);
-        vel = CaculateForce(context.speedAngle, alpha + speedAlpha * deltaTime);
+        alpha = GameUtils.Instance.CalculateAlpha(body.velocity.x, body.velocity.y);
+        vel = CalculateForce(context.speedAngle, alpha + speedAlpha * deltaTime);
         body.velocity = vel;
         context.speedAngle += 2 * deltaTime;
     }

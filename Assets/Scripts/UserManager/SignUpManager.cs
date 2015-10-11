@@ -13,6 +13,12 @@ public class SignUpManager : MonoBehaviour {
     public GameObject loginPanel;
     public GameObject signUpPanel;
 
+    public void GoBack()
+    {
+        loginPanel.SetActive(true);
+        signUpPanel.SetActive(false);
+    }
+
     private IEnumerator ShowLoginScreen(Task task)
     {
         while (!task.IsCompleted) yield return null;
