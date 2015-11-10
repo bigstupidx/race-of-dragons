@@ -4,6 +4,7 @@ using System.Collections;
 public class MainMenuBehaviour : MonoBehaviour {
 
     public GameObject optionDialog;
+    public GameObject friendDialog;
 
     #region UI Delegate
     public void OnOptionClick()
@@ -13,17 +14,17 @@ public class MainMenuBehaviour : MonoBehaviour {
 
     public void OnStoreClick()
     {
-
+        Application.LoadLevel("Scene_Store");        
     }
 
     public void OnFriendsClick()
     {
-
+        Instantiate(friendDialog);
     }
 
     public void OnRaceClick()
     {
-
+        Application.LoadLevel("Scene_Select_Mode");
     }
     #endregion
 
