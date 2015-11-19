@@ -1,17 +1,43 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
+
+public enum Element
+{
+    Fire = 0,
+    Ice,
+    Thunder
+}
+
+[Serializable]
+public class DragonPropertie
+{
+    public int level = 1;
+    public int energy = 100;    
+    public int exp;
+    public Element element = Element.Fire;
+    public float timeCooldown = 30;
+    public int speedRecoverEnergy = 3; // per second
+}
 
 public class PlayerController : MonoBehaviour
 {
     private StateMachine<PlayerController> stateMachine;
     private float alpha;
-    private Rigidbody2D body;
 
+    [HideInInspector]
     public bool controlable = false;
-    public float speedAngle = GameConsts.Instance.PLAYER_SPEED_ANGLE_DEFAULT;
 
     [HideInInspector]
     public Animator animator;
+
+    [HideInInspector]
+    public Rigidbody2D body;
+
+    public float speedAngle = GameConsts.Instance.PLAYER_SPEED_ANGLE_DEFAULT;
+
+    [Space(10)]
+    public DragonPropertie dragonPropertie;    
 
     #region Get & Set
 
@@ -30,7 +56,15 @@ public class PlayerController : MonoBehaviour
         return result;
     }
 
-    void Awake ()
+    public void Init()
+    {
+        GameObject.Destroy(transform.GetChild(0).gameObject);
+        GameObject dragon = Instantiate(Resources.Load("Prefabs/Dragon/" + dragonPropertie.element.ToString())) as GameObject;
+        dragon.transform.parent = transform;
+    }
+
+    #region MonoBehaviour
+    void Awake()
     {
         // create new state machine
         stateMachine = new StateMachine<PlayerController>(this, new PlayerWaitingState());
@@ -38,6 +72,7 @@ public class PlayerController : MonoBehaviour
         // add all of states to state machine so that we can switch to them
         stateMachine.AddState(new PlayerFlyState());
         stateMachine.AddState(new PlayerFallState());
+        stateMachine.AddState(new PlayerRunState());
 
         stateMachine.ChangeState<PlayerWaitingState>();
         // listen for state changes
@@ -46,25 +81,37 @@ public class PlayerController : MonoBehaviour
             Debug.Log("state changed: " + stateMachine.CurrentState);
         };
 
+        Init();
+
         body = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
-	}
+    }
 
-    // Use this for initialization
     void Start()
     {
 
     }
 
-	// Update is called once per frame
-	void Update ()
+    void Update()
     {
         if (!controlable)
             return;
-        Camera.main.transform.position = new Vector3(transform.position.x, 0, Camera.main.transform.position.z);
+
         alpha = CalculateAlpha(body.velocity.x, body.velocity.y);
         transform.rotation = Quaternion.Euler(0, 0, alpha);
 
         stateMachine.Update(Time.deltaTime);
-	}
+    }
+
+    public void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag.Equals("Platform"))
+        {
+            stateMachine.ChangeState<PlayerRunState>();
+        }
+    } 
+
+    #endregion
+
+
 }

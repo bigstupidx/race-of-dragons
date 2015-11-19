@@ -13,7 +13,7 @@ public class PlayerFallState : IState<PlayerController>
 
     public override void Begin()
     {
-        body = context.GetComponent<Rigidbody2D>();        
+        body = context.body;       
         body.gravityScale = 1f;
     }
 

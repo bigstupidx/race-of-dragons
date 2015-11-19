@@ -26,7 +26,7 @@ public class PlayerFlyState : IState<PlayerController>
 
     public override void Begin()
     {
-        body = context.GetComponent<Rigidbody2D>();
+        body = context.body;
         body.gravityScale = 0;
         context.animator.SetBool("isFlying", true);       
     }
