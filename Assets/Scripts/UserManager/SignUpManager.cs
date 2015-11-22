@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using Parse;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 public class SignUpManager : MonoBehaviour {
 
@@ -64,8 +65,19 @@ public class SignUpManager : MonoBehaviour {
                         Debug.Log("Sign Up success!");
                     }
                     else
-                    {
+                    {                        
                         Debug.Log("Sign up failed!");
+
+                        // Errors from Parse Cloud and network interactions
+                        using (IEnumerator<System.Exception> enumerator = t.Exception.InnerExceptions.GetEnumerator())
+                        {
+                            if (enumerator.MoveNext())
+                            {
+                                ParseException error = (ParseException)enumerator.Current;
+                                // error.Message will contain an error message
+                                // error.Code will return "OtherCause"
+                            }
+                        }
                     }
                 });
                

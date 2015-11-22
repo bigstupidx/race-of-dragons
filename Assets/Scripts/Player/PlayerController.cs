@@ -13,7 +13,7 @@ public enum Element
 public class DragonPropertie
 {
     public int level = 1;
-    public int energy = 100;    
+    public int energy = 100;
     public int exp;
     public Element element = Element.Fire;
     public float timeCooldown = 30;
@@ -32,12 +32,17 @@ public class PlayerController : MonoBehaviour
     public Animator animator;
 
     [HideInInspector]
-    public Rigidbody2D body;
+    public Rigidbody2D body; 
 
     public float speedAngle = GameConsts.Instance.PLAYER_SPEED_ANGLE_DEFAULT;
+    public float maxSpeedAngle = 20;
 
     [Space(10)]
-    public DragonPropertie dragonPropertie;    
+    public DragonPropertie dragonPropertie;
+
+    [Header("Skills")]
+    public Transform skillPlaceHolder;
+    public GameObject thunderBoost;
 
     #region Get & Set
 
@@ -73,6 +78,8 @@ public class PlayerController : MonoBehaviour
         stateMachine.AddState(new PlayerFlyState());
         stateMachine.AddState(new PlayerFallState());
         stateMachine.AddState(new PlayerRunState());
+        stateMachine.AddState(new PlayerBurningState());
+        stateMachine.AddState(new PlayerThunderBoostState());
 
         stateMachine.ChangeState<PlayerWaitingState>();
         // listen for state changes
@@ -84,7 +91,7 @@ public class PlayerController : MonoBehaviour
         Init();
 
         body = GetComponent<Rigidbody2D>();
-        animator = GetComponentInChildren<Animator>();
+        animator = GetComponentInChildren<Animator>();       
     }
 
     void Start()
@@ -94,6 +101,12 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // test skill
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            UserSkill();
+        }
+
         if (!controlable)
             return;
 
@@ -101,6 +114,8 @@ public class PlayerController : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, alpha);
 
         stateMachine.Update(Time.deltaTime);
+
+        speedAngle = Mathf.Min(speedAngle, maxSpeedAngle);
     }
 
     public void OnCollisionEnter2D(Collision2D other)
@@ -113,5 +128,18 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-
+    public void UserSkill()
+    {
+        if (dragonPropertie.element == Element.Fire)
+        {
+            GameObject fireball = Instantiate(Resources.Load("Fireball"), skillPlaceHolder.position, skillPlaceHolder.rotation) as GameObject;
+            FireballController fireballController = fireball.GetComponent<FireballController>();
+            fireballController.SetParentId(this.gameObject.GetInstanceID());
+        }
+        
+        if (dragonPropertie.element == Element.Thunder)
+        {
+            stateMachine.ChangeState<PlayerThunderBoostState>();
+        }
+    }
 }
