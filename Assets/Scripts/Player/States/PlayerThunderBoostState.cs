@@ -15,8 +15,7 @@ public class PlayerThunderBoostState : IState<PlayerController>
 
     public override void Begin()
     {
-        context.speedAngle = 13;
-        context.thunderBoost.SetActive(true);
+        context.speedAngle = 13;   
         body = context.body;
         
         float alpha = GameUtils.Instance.DegreeToRadian(context.transform.rotation.eulerAngles.z);
@@ -29,8 +28,7 @@ public class PlayerThunderBoostState : IState<PlayerController>
     public override void Reason()
     {
         if (Input.GetMouseButton(0))
-        {
-            context.thunderBoost.SetActive(false);
+        {           
             machine.ChangeState<PlayerFlyState>();
         }
     }
@@ -40,8 +38,7 @@ public class PlayerThunderBoostState : IState<PlayerController>
         timer += deltaTime;
         if (timer >= 1)
         {
-            body.velocity = body.velocity * 0.5f;
-            context.thunderBoost.SetActive(false);
+            body.velocity = body.velocity * 0.5f;            
             timer = 0;
             machine.ChangeState<PlayerFlyState>();            
         }

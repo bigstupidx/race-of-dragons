@@ -14,7 +14,7 @@ public class PlayerData
 
     private PlayerData()
     {
-        InitDefaultData();
+        
     }
 
     public static PlayerData Current
@@ -22,7 +22,11 @@ public class PlayerData
         get
         {
             if (current == null)
+            {
                 current = new PlayerData();
+                current.Load();
+            }
+                
             return current;
         }
     }
@@ -57,6 +61,9 @@ public class PlayerData
         gold = 0;
 
         listDragon = new List<DragonPropertie>();
+        DragonPropertie fireDragon = new DragonPropertie();
+        listDragon.Add(fireDragon);
+
         currentDragonIndex = 0;
     }
 
@@ -99,7 +106,8 @@ public class PlayerData
 
     public void LoadDefault()
     {
-        current = new PlayerData();
+        InitDefaultData();
+        current = this;
         Save(current);
     }
 

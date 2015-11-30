@@ -5,8 +5,7 @@ using System;
 public class RadarController : MonoBehaviour
 {
     public GameObject target;
-    [NonSerialized]
-    public int parentId;
+    public int playerId;
 
 
     void Start()
@@ -16,9 +15,11 @@ public class RadarController : MonoBehaviour
 
     public void OnTriggerStay2D(Collider2D other)
     {
-        if (other.tag.Equals("Player") && target == null && parentId != null && other.gameObject.GetInstanceID() != parentId)
+        if (other.tag.Equals("Player") && target == null && playerId != 0)
         {
-            target = other.gameObject;
+            PlayerController playerController = other.GetComponent<PlayerController>();
+            if (playerController.PlayerId != playerId)
+                target = other.gameObject;
         }
     }
 

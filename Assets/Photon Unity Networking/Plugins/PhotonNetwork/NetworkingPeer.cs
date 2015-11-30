@@ -1143,7 +1143,7 @@ internal class NetworkingPeer : LoadbalancingPeer, IPhotonPeerListener
             }
             else// if (PhotonNetwork.logLevel >= PhotonLogLevel.Informational)
             {
-                Debug.LogError("Operation failed: " + operationResponse.ToStringFull() + " Server: " + this.server);
+                Debug.LogWarning("Operation failed: " + operationResponse.ToStringFull() + " Server: " + this.server);
             }
         }
 

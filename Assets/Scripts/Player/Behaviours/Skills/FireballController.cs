@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FireballController : MonoBehaviour
+public class FireballController : Photon.PunBehaviour
 {
     public Animator animator;
     public ParticleSystem particle;
     public RadarController radar;
     public float maxForce = 10;
+    public int playerId = 0;
 
     private Rigidbody2D body;
     private Collider2D collider;
@@ -23,6 +24,10 @@ public class FireballController : MonoBehaviour
         force.force = new Vector2(maxForce * Mathf.Cos(alpha), maxForce * Mathf.Sin(alpha));
 
         body.velocity = force.force;
+
+        // Network
+        playerId = photonView.ownerId;
+        radar.playerId = playerId;
     }
 		
 	void Update ()
@@ -48,18 +53,13 @@ public class FireballController : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.GetInstanceID() == radar.parentId)
-            return;
-
-        particle.Stop();
-        collider.enabled = false;
-        force.enabled = false;
-        body.velocity = Vector2.zero;
-        particle.Stop();
 
         if (other.gameObject.tag.Equals("Player"))
         {
             PlayerController player = other.gameObject.GetComponent<PlayerController>();
+            if (player.PlayerId == playerId)
+                return;
+            
             player.GetStateMachine().ChangeState<PlayerBurningState>();           
         }
         else
@@ -67,11 +67,12 @@ public class FireballController : MonoBehaviour
 
         }
 
-        animator.SetBool("isExplosive", true);
-    }
+        particle.Stop();
+        collider.enabled = false;
+        force.enabled = false;
+        body.velocity = Vector2.zero;
+        particle.Stop();
 
-    public void SetParentId(int parentId)
-    {
-        radar.parentId = parentId;
+        animator.SetBool("isExplosive", true);
     }
 }

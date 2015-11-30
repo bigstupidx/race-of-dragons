@@ -7,8 +7,7 @@
 using UnityEngine;
 
 public class InGameNetworkManager : Photon.MonoBehaviour
-{
-    public Transform playerPrefab;
+{    
 
     void Start()
     {
@@ -20,7 +19,11 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         }
 
         // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
-        GameObject player = PhotonNetwork.Instantiate("Player", transform.position, Quaternion.identity, 0);
+        string dragonType = PlayerData.Current.CurrentDragon.element + "Dragon";
+        GameObject player = PhotonNetwork.Instantiate(dragonType, transform.position, Quaternion.identity, 0);
+        SmoothCamera2D smoothCamera = Camera.main.GetComponent<SmoothCamera2D>();
+        smoothCamera.target = player;
+
         PlayerController controller = player.GetComponent<PlayerController>();
         controller.controlable = true;
         //controller.GetStateMachine().ChangeState<PlayerFlyState>();

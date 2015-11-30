@@ -18,21 +18,24 @@ public class DragonPropertie
     public Element element = Element.Fire;
     public float timeCooldown = 30;
     public int speedRecoverEnergy = 3; // per second
+
+    public DragonPropertie()
+    { }
+
 }
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : Photon.PunBehaviour
 {
     private StateMachine<PlayerController> stateMachine;
     private float alpha;
 
-    [HideInInspector]
+    //[HideInInspector]
     public bool controlable = false;
 
     [HideInInspector]
     public Animator animator;
-
     [HideInInspector]
-    public Rigidbody2D body; 
+    public Rigidbody2D body;
 
     public float speedAngle = GameConsts.Instance.PLAYER_SPEED_ANGLE_DEFAULT;
     public float maxSpeedAngle = 20;
@@ -42,7 +45,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Skills")]
     public Transform skillPlaceHolder;
-    public GameObject thunderBoost;
+    public bool isSlow;
 
     #region Get & Set
 
@@ -51,6 +54,13 @@ public class PlayerController : MonoBehaviour
         return stateMachine;
     }
 
+    public int PlayerId
+    {
+        get
+        {
+            return photonView.ownerId;
+        }
+    }
     #endregion
 
     private float CalculateAlpha(float x, float y)
@@ -59,13 +69,6 @@ public class PlayerController : MonoBehaviour
         result = GameUtils.Instance.RadianToDegree(result);
 
         return result;
-    }
-
-    public void Init()
-    {
-        GameObject.Destroy(transform.GetChild(0).gameObject);
-        GameObject dragon = Instantiate(Resources.Load("Prefabs/Dragon/" + dragonPropertie.element.ToString())) as GameObject;
-        dragon.transform.parent = transform;
     }
 
     #region MonoBehaviour
@@ -85,13 +88,11 @@ public class PlayerController : MonoBehaviour
         // listen for state changes
         stateMachine.onStateChanged += () =>
         {
-            Debug.Log("state changed: " + stateMachine.CurrentState);
+            //Debug.Log("state changed: " + stateMachine.CurrentState);
         };
 
-        Init();
-
         body = GetComponent<Rigidbody2D>();
-        animator = GetComponentInChildren<Animator>();       
+        animator = GetComponentInChildren<Animator>();
     }
 
     void Start()
@@ -101,14 +102,19 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+        if (!controlable)
+            return;
+
+        if (isSlow)
+            Time.timeScale = 0.5f;
+        else
+            Time.timeScale = 1.0f;
         // test skill
         if (Input.GetKeyDown(KeyCode.Space))
         {
             UserSkill();
         }
-
-        if (!controlable)
-            return;
 
         alpha = CalculateAlpha(body.velocity.x, body.velocity.y);
         transform.rotation = Quaternion.Euler(0, 0, alpha);
@@ -124,22 +130,54 @@ public class PlayerController : MonoBehaviour
         {
             stateMachine.ChangeState<PlayerRunState>();
         }
-    } 
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag.Equals("IceAge"))
+        {
+            IceAgeController iceAge = collision.transform.parent.GetComponent<IceAgeController>();
+            if (iceAge.ID != PlayerId)
+                isSlow = true;
+        }
+    }
+
+    public void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag.Equals("IceAge"))
+        {
+            IceAgeController iceAge = collision.transform.parent.GetComponent<IceAgeController>();
+            if (iceAge.ID != PlayerId)
+                isSlow = false;
+        }
+    }
 
     #endregion
+
 
     public void UserSkill()
     {
         if (dragonPropertie.element == Element.Fire)
         {
-            GameObject fireball = Instantiate(Resources.Load("Fireball"), skillPlaceHolder.position, skillPlaceHolder.rotation) as GameObject;
-            FireballController fireballController = fireball.GetComponent<FireballController>();
-            fireballController.SetParentId(this.gameObject.GetInstanceID());
+            GameObject fireball = PhotonNetwork.Instantiate("Fireball", skillPlaceHolder.position, skillPlaceHolder.rotation, 0) as GameObject;
+            //FireballController fireballController = fireball.GetComponent<FireballController>();            
         }
-        
+
         if (dragonPropertie.element == Element.Thunder)
         {
+            GameObject thunderBoost = PhotonNetwork.Instantiate("ThunderBoost", transform.position, Quaternion.identity, 0) as GameObject;
+
+            ThunderBoostController thunderController = thunderBoost.GetComponent<ThunderBoostController>();
+
             stateMachine.ChangeState<PlayerThunderBoostState>();
+        }
+
+        if (dragonPropertie.element == Element.Ice)
+        {
+            GameObject iceAge = PhotonNetwork.Instantiate("IceAge", transform.position, Quaternion.identity, 0) as GameObject;
+
+            IceAgeController iceAgeController = iceAge.GetComponent<IceAgeController>();
+            iceAgeController.timeExist = 15;
         }
     }
 }
