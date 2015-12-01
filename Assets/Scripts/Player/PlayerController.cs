@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum Element
 {
@@ -20,7 +21,28 @@ public class DragonPropertie
     public int speedRecoverEnergy = 3; // per second
 
     public DragonPropertie()
-    { }
+    {
+
+    }
+
+    public DragonPropertie(IDictionary<string, object> data)
+    {        
+        level = int.Parse(data["level"].ToString());
+        energy = int.Parse(data["energy"].ToString());
+        exp = int.Parse(data["exp"].ToString());
+        element = (Element)(int.Parse(data["element"].ToString()));
+    }
+
+    public Dictionary<string, object> ToDictionary()
+    {
+        Dictionary<string, object> result = new Dictionary<string, object>();
+        result.Add("level", level);
+        result.Add("energy", energy);
+        result.Add("exp", exp);
+        result.Add("element", (int)element);
+
+        return result;
+    }
 
 }
 

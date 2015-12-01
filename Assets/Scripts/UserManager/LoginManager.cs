@@ -12,8 +12,8 @@ public class LoginManager : MonoBehaviour {
     public InputField username;
     public InputField password;
     public Text txtInfo;
-    public GameObject loginPanel;
-    public GameObject signUpPanel;
+    public GameObject signUpDialogPrefab;
+    public GameObject loadingDialogPrefab;
     
     void Awake()
     {
@@ -21,30 +21,21 @@ public class LoginManager : MonoBehaviour {
        {
            Debug.Log("Init done!");
        });
-
-        if (ParseUser.CurrentUser != null)
-        {
-            ParseUser.LogOut();
-        }
-        else
-        {
-
-        }
     }
-
-    // Use this for initialization
-    void Start() {
-
+    
+    void Start()
+    {
+        //ParseUser.LogOutAsync();
     }
 
     public void FacebookLogin()
     {
-        FB.Login("user_about_me", delegate (FBResult result) 
+        FB.Login("user_about_me,user_friends", delegate (FBResult result) 
         {
             if (FB.IsLoggedIn)
             {
                 Debug.Log("Login success");
-                StartCoroutine("ParseLoginWithFacebook");
+                StartCoroutine(_ParseLoginWithFacebook());
             }
             else
             {
@@ -53,7 +44,7 @@ public class LoginManager : MonoBehaviour {
         });
     }
 
-    private IEnumerator ParseLoginWithFacebook()
+    private IEnumerator _ParseLoginWithFacebook()
     {
         if (FB.IsLoggedIn)
         {
@@ -89,16 +80,14 @@ public class LoginManager : MonoBehaviour {
                         userProfile["pictureURL"] = "https://graph.facebook.com/" + userProfile["facebookId"] + "/picture?type=large&return_ssl_resources=1";
                     }                  
 
-                    StartCoroutine("saveUserProfile", userProfile);
-
-                    //StartCoroutine("UpdateProfilePictureTexture", userProfile["pictureURL"]);
+                    StartCoroutine(_SaveUserProfile(userProfile));
                 });
 
             }
         }
     }
 
-    private IEnumerator UpdateProfilePictureTexture(string pictureURL)
+    private IEnumerator _UpdateProfilePictureTexture(string pictureURL)
     {
         string url = pictureURL + "&access_token=" + FB.AccessToken; ;
         WWW www = new WWW(url);
@@ -106,7 +95,7 @@ public class LoginManager : MonoBehaviour {
         //avatar.texture = www.texture;
     }
 
-    private IEnumerator saveUserProfile(Dictionary<string, string> profile)
+    private IEnumerator _SaveUserProfile(Dictionary<string, string> profile)
     {
         var user = ParseUser.CurrentUser;
         user["profile"] = profile;
@@ -135,6 +124,7 @@ public class LoginManager : MonoBehaviour {
 
     public void ParseLogin()
     {
+        Task taskSync = null;
         Task task = ParseUser.LogInAsync(username.text, password.text).ContinueWith(t =>
         {
             if (t.IsFaulted || t.IsCanceled)
@@ -144,39 +134,39 @@ public class LoginManager : MonoBehaviour {
             }
             else
             {
-                Debug.Log("Login was successful.");                              
+                Debug.Log("Login was successful.");
+
+                var param = new Dictionary<string, object>();
+                param.Add("data", PlayerData.Current.ToDictionary());
+
+                taskSync = ParseCloud.CallFunctionAsync<ParseObject>("mergeData", param).ContinueWith(t3 =>
+                {
+                    var newData = t3.Result;
+                    PlayerData.Current.SyncData(newData);
+                });
             }
         });
-        StartCoroutine(ChangeScene(task));
+
+        GameObject loadingDialog = Instantiate(loadingDialogPrefab) as GameObject;
+
+        StartCoroutine(_ChangeScene(task));
     }
 
-    private IEnumerator ChangeScene(Task t)
+    private IEnumerator _ChangeScene(Task t)
     {
         while (!t.IsCompleted) yield return null;
+
         Application.LoadLevel(GameConsts.Instance.LEVEL_WAITING_NAME);
+    }
+
+    private IEnumerator _SaveData(Task t)
+    {
+        while (!t.IsCompleted) yield return null;
+        PlayerData.Current.Save();
     }
 
     public void ShowSignUpScreen()
     {
-        if (ParseUser.CurrentUser != null)
-        {
-            ParseUser.LogOutAsync().ContinueWith(t =>
-            {
-                if (t.IsFaulted || t.IsCanceled)
-                {
-                    Debug.Log("Logout failed!");
-                }
-                else
-                {
-                    loginPanel.SetActive(false);
-                    signUpPanel.SetActive(true);
-                }
-            });
-        }
-        else
-        {
-            loginPanel.SetActive(false);
-            signUpPanel.SetActive(true);
-        }
+        Instantiate(signUpDialogPrefab);
     }
 }

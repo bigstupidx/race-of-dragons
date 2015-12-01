@@ -11,20 +11,33 @@ public class SignUpManager : MonoBehaviour {
     public InputField password;
     public InputField email;
     public Text txtInfo;
-    public GameObject loginPanel;
-    public GameObject signUpPanel;
+    public Animator animator;
+    public GameObject loadingDialogPrefab;
 
-    public void GoBack()
+    public void OnBack()
     {
-        loginPanel.SetActive(true);
-        signUpPanel.SetActive(false);
+        animator.SetBool("isDisappear", true);
     }
 
-    private IEnumerator ShowLoginScreen(Task task)
+    private IEnumerator _ShowLoginScreen(Task task)
     {
+        GameObject loadingDialog = Instantiate(loadingDialogPrefab) as GameObject;
+        Animator loadingAnimator = loadingDialog.GetComponent<Animator>();
+
         while (!task.IsCompleted) yield return null;
-        loginPanel.SetActive(true);
-        signUpPanel.SetActive(false);       
+
+        loadingAnimator.SetBool("isDisappear", true);
+
+        while (loadingDialog != null) yield return null;
+
+        if (task.IsCanceled || task.IsFaulted)
+        {
+
+        }
+        else
+        {
+            animator.SetBool("isDisappear", true);
+        }
     }
 
 
@@ -47,7 +60,7 @@ public class SignUpManager : MonoBehaviour {
                         Username = username.text,
                         Password = password.text,
                         Email = email.text
-                    };                   
+                    };
                 }
                 else
                 {
@@ -81,7 +94,7 @@ public class SignUpManager : MonoBehaviour {
                     }
                 });
                
-                StartCoroutine(ShowLoginScreen(signUpTask));
+                StartCoroutine(_ShowLoginScreen(signUpTask));
             }
         }
 

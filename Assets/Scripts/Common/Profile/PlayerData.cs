@@ -36,10 +36,12 @@ public class PlayerData
 
     public int level;
     public int exp;
+    public int elo;
     public int gold;
 
-    public List<DragonPropertie> listDragon;
-    public int currentDragonIndex;
+    public Dictionary<string, DragonPropertie> dragons;
+    public Dictionary<string, object> items;
+    public string currentDragonIndex;
 
     #endregion
 
@@ -47,8 +49,8 @@ public class PlayerData
     {
         get
         {
-            if (listDragon != null && listDragon.Count > 0)
-                return listDragon[currentDragonIndex];
+            if (dragons != null && dragons.Count > 0)
+                return dragons[currentDragonIndex];
 
             return null;
         }
@@ -59,12 +61,13 @@ public class PlayerData
         level = 1;
         exp = 0;
         gold = 0;
+        elo = 0;
 
-        listDragon = new List<DragonPropertie>();
+        dragons = new Dictionary<string, DragonPropertie>();
         DragonPropertie fireDragon = new DragonPropertie();
-        listDragon.Add(fireDragon);
+        dragons.Add(fireDragon.element.ToString(), fireDragon);
 
-        currentDragonIndex = 0;
+        currentDragonIndex = fireDragon.element.ToString();
     }
 
     #region Save & Load
@@ -112,4 +115,41 @@ public class PlayerData
     }
 
     #endregion
+
+    public Dictionary<string, object> ToDictionary()
+    {
+        Dictionary<string, object> result = new Dictionary<string, object>();
+
+        result.Add("level", level);
+        result.Add("exp", exp);
+        result.Add("elo", elo);
+        result.Add("gold", gold);
+
+        var dicDragons = new Dictionary<string, Dictionary<string, object>>();
+
+        foreach (var item in dragons)
+        {
+            dicDragons.Add(item.Key.ToString(), item.Value.ToDictionary());
+        }
+        result.Add("dragons", dicDragons);
+        //result.Add("items", items);
+
+        return result;
+    }
+
+    public void SyncData(ParseObject data)
+    {
+        level = data.Get<int>("level");
+        exp = data.Get<int>("exp");
+        gold = data.Get<int>("gold");
+        elo = data.Get<int>("elo");
+
+        var newDragons = data.Get<IDictionary<string, object>>("dragons");
+        dragons.Clear();
+        foreach (var item in newDragons)
+        {
+            var dragon = new DragonPropertie((IDictionary<string, object>)item.Value);
+            dragons.Add(item.Key, dragon);
+        }
+    }
 }
