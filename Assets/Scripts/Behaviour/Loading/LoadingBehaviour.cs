@@ -12,7 +12,7 @@ public class LoadingBehaviour : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        StartCoroutine(DisplayLoadingScreen());
+        //StartCoroutine(DisplayLoadingScreen());
 	}
 	
 	IEnumerator DisplayLoadingScreen()
