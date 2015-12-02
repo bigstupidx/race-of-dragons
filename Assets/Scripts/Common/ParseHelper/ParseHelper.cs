@@ -9,12 +9,12 @@ public class ParseHelper : Singleton<ParseHelper>
 	
 	void Start ()
     {
-        var param = new Dictionary<string, object>();
-        param.Add("userId", "U3sFSPkORb");
-        ParseCloud.CallFunctionAsync<int>("getRankOfUser", param).ContinueWith(t =>
-        {
-            Debug.Log(t.Result);
-        });
+        //var param = new Dictionary<string, object>();
+        //param.Add("userId", "U3sFSPkORb");
+        //ParseCloud.CallFunctionAsync<int>("getRankOfUser", param).ContinueWith(t =>
+        //{
+        //    Debug.Log(t.Result);
+        //});
 
         
         //ParseUser.LogInAsync("thienlt", "123456").ContinueWith(t =>

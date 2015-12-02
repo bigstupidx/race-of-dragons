@@ -16,12 +16,7 @@ public class GameConsts {
 
             return mInstance;
         }
-    }
-
-    public readonly string LEVEL_INIT_NAME = "Scene_Init";
-    public readonly string LEVEL_LOGIN_NAME = "Scene_Login";
-    public readonly string LEVEL_WAITING_NAME = "Scene_Wating";
-    public readonly string LEVEL_GAME_NAME = "Scene_Game";
+    }    
 
     public readonly string STRING_LOGIN_FAIL = "Your username or password incorrect!";
     public readonly string STRING_SIGN_UP_FAIL = "Sign up fail!";

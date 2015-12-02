@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Facebook.MiniJSON;
 using Parse;
 using System.Threading.Tasks;
+using System;
 
 public class LoginManager : MonoBehaviour {
   
@@ -14,6 +15,8 @@ public class LoginManager : MonoBehaviour {
     public Text txtInfo;
     public GameObject signUpDialogPrefab;
     public GameObject loadingDialogPrefab;
+
+    private LoadingDialogBehaviour loadingDialogBehaviour;
     
     void Awake()
     {
@@ -25,7 +28,7 @@ public class LoginManager : MonoBehaviour {
     
     void Start()
     {
-        //ParseUser.LogOutAsync();
+        ParseUser.LogOutAsync();
     }
 
     public void FacebookLogin()
@@ -123,48 +126,67 @@ public class LoginManager : MonoBehaviour {
     }
 
     public void ParseLogin()
+    {        
+
+        GameObject loadingDialog = Instantiate(loadingDialogPrefab) as GameObject;
+        loadingDialogBehaviour = loadingDialog.GetComponent<LoadingDialogBehaviour>();
+        Dictionary<string, IEnumerator> listToDo = new Dictionary<string, IEnumerator>();
+        listToDo.Add("Checking server...", _ConfirmLogin());
+        listToDo.Add("Sync data ...", _SyncData());
+
+        loadingDialogBehaviour.SetUpToDoList(listToDo);
+    }
+
+    private IEnumerator _ConfirmLogin()
     {
-        Task taskSync = null;
-        Task task = ParseUser.LogInAsync(username.text, password.text).ContinueWith(t =>
+        Task loginTask = ParseUser.LogInAsync(username.text, password.text).ContinueWith(t =>
         {
             if (t.IsFaulted || t.IsCanceled)
             {
                 Debug.Log(" The login failed. Check the error to see why.");
-                txtInfo.text = GameConsts.Instance.STRING_LOGIN_FAIL;
+                //txtInfo.text = GameConsts.Instance.STRING_LOGIN_FAIL;
             }
             else
             {
                 Debug.Log("Login was successful.");
-
-                var param = new Dictionary<string, object>();
-                param.Add("data", PlayerData.Current.ToDictionary());
-
-                taskSync = ParseCloud.CallFunctionAsync<ParseObject>("mergeData", param).ContinueWith(t3 =>
-                {
-                    var newData = t3.Result;
-                    PlayerData.Current.SyncData(newData);
-                });
             }
         });
 
-        GameObject loadingDialog = Instantiate(loadingDialogPrefab) as GameObject;
+        while (!loginTask.IsCompleted) yield return null;
 
-        StartCoroutine(_ChangeScene(task));
+        // Login completed, check results
+        if (ParseUser.CurrentUser == null)
+        {
+            txtInfo.text = GameConsts.Instance.STRING_LOGIN_FAIL;
+            loadingDialogBehaviour.ForceStopLoading();
+        }
     }
 
-    private IEnumerator _ChangeScene(Task t)
+    private IEnumerator _SyncData()
     {
-        while (!t.IsCompleted) yield return null;
+        if (ParseUser.CurrentUser != null)
+        {
+            var param = new Dictionary<string, object>();
+            param.Add("data", PlayerData.Current.ToDictionary());
 
-        Application.LoadLevel(GameConsts.Instance.LEVEL_WAITING_NAME);
+            var taskSync = ParseCloud.CallFunctionAsync<ParseObject>("mergeData", param).ContinueWith(t2 =>
+            {
+                if (t2.IsCompleted)
+                {
+                    var newData = t2.Result;
+                    PlayerData.Current.SyncData(newData);
+                }
+            });
+
+            while (!taskSync.IsCompleted) yield return null;
+
+            if (!taskSync.IsFaulted && !taskSync.IsCanceled)
+            {
+                PlayerData.Current.Save();
+            }
+        }
     }
-
-    private IEnumerator _SaveData(Task t)
-    {
-        while (!t.IsCompleted) yield return null;
-        PlayerData.Current.Save();
-    }
-
+   
     public void ShowSignUpScreen()
     {
         Instantiate(signUpDialogPrefab);
