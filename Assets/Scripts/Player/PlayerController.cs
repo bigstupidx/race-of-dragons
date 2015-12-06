@@ -54,10 +54,8 @@ public class PlayerController : Photon.PunBehaviour
     //[HideInInspector]
     public bool controlable = false;
 
-    [HideInInspector]
-    public Animator animator;
-    [HideInInspector]
-    public Rigidbody2D body;
+    [HideInInspector] public Animator animator;
+    [HideInInspector] public Rigidbody2D body;
 
     public float speedAngle = GameConsts.Instance.PLAYER_SPEED_ANGLE_DEFAULT;
     public float maxSpeedAngle = 20;
@@ -68,6 +66,7 @@ public class PlayerController : Photon.PunBehaviour
     [Header("Skills")]
     public Transform skillPlaceHolder;
     public bool isSlow;
+    public Sprite imageOfSkill;
 
     #region Get & Set
 

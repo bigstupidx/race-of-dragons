@@ -6,9 +6,8 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 {
     public Text position;
     public Image skillHolder;
-    public Image itemHolder;
-    public PhotonView playerView;
-    public PlayerController playerController;
+    public Image itemHolder;    
+    [HideInInspector] public PlayerController playerController;
 
     void Start()
     {
@@ -27,7 +26,8 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 
         playerController = player.GetComponent<PlayerController>();
         playerController.controlable = true;
-        
+
+        skillHolder.sprite = playerController.imageOfSkill;
     }
 
     void Update()
