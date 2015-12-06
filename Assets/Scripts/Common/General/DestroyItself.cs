@@ -26,4 +26,9 @@ public class DestroyItself : MonoBehaviour
             PhotonNetwork.Destroy(this.gameObject);
         }
     }
+
+    public void Hide()
+    {
+        this.gameObject.SetActive(false);
+    }
 }

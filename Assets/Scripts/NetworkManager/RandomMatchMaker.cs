@@ -72,7 +72,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
         }
 
         // if you wanted more debug out, turn this on:
-        PhotonNetwork.logLevel = PhotonLogLevel.Full;
+        PhotonNetwork.logLevel = PhotonLogLevel.ErrorsOnly;
     }
 
     public void OnGUI()
@@ -185,7 +185,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
                     Debug.Log("TEST: " + timeCountDown);
                     if (PhotonNetwork.isMasterClient)
                         PhotonNetwork.LoadLevel("Scene_Game");
-                    timeCountDown = 0;
+                    timeCountDown = GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY;
                 }
             }
         }
