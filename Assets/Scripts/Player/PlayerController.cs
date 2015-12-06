@@ -83,6 +83,19 @@ public class PlayerController : Photon.PunBehaviour
             return photonView.ownerId;
         }
     }
+
+    // PositionX in server not client
+    public float PosX
+    {
+        get
+        {
+            return GameUtils.GetCustomProperty<float>(photonView, "POS_X", 0.0f);
+        }
+        set
+        {
+            GameUtils.SetCustomProperty<float>(photonView, "POS_X", value);
+        }
+    }
     #endregion
 
     private float CalculateAlpha(float x, float y)

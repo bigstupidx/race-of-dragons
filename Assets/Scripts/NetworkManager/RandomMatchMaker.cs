@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -182,13 +183,13 @@ public class RandomMatchMaker : Photon.MonoBehaviour
                 if (timeCountDown >= GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY)
                 {
                     PhotonNetwork.room.visible = false;
-                    Debug.Log("TEST: " + timeCountDown);
                     if (PhotonNetwork.isMasterClient)
                         PhotonNetwork.LoadLevel("Scene_Game");
                     timeCountDown = GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY;
-                }
+                }                
             }
         }
         
     }
+
 }

@@ -1,13 +1,14 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WorkerInGame.cs" company="Exit Games GmbH">
-//   Part of: Photon Unity Networking
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InGameNetworkManager : Photon.MonoBehaviour
-{    
+{
+    public Text position;
+    public Image skillHolder;
+    public Image itemHolder;
+    public PhotonView playerView;
+    public PlayerController playerController;
 
     void Start()
     {
@@ -24,9 +25,40 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         SmoothCamera2D smoothCamera = Camera.main.GetComponent<SmoothCamera2D>();
         smoothCamera.target = player;
 
-        PlayerController controller = player.GetComponent<PlayerController>();
-        controller.controlable = true;
-        //controller.GetStateMachine().ChangeState<PlayerFlyState>();
+        playerController = player.GetComponent<PlayerController>();
+        playerController.controlable = true;
+        
+    }
+
+    void Update()
+    {
+        position.text = GetPositionOfCurrentPlayer();
+    }
+
+    string GetPositionOfCurrentPlayer()
+    {
+        GameObject[] listPlayer = GameObject.FindGameObjectsWithTag("Player");
+        List<float> listPosX = new List<float>();
+        for (int i = 0; i < listPlayer.Length; i++)
+        {
+            var player = listPlayer[i].GetComponent<PlayerController>();
+            listPosX.Add(player.PosX);
+        }
+        listPosX.Sort();
+
+        int position = listPosX.Count - listPosX.IndexOf(playerController.PosX);
+
+        switch (position)
+        {
+            case 1:
+                return "1st";                
+            case 2:
+                return "2nd";
+            case 3:
+                return "3rd";
+            default:
+                return "4th";
+        }
     }
 
     public void OnGUI()

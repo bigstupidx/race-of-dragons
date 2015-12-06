@@ -2866,8 +2866,8 @@ public static class PhotonNetwork
         networkingPeer.SetLevelInPropsIfSynced(levelName);
 
         PhotonNetwork.isMessageQueueRunning = false;
-        networkingPeer.loadingLevelAndPausedNetwork = true;
-        Application.LoadLevel(levelName);
+        networkingPeer.loadingLevelAndPausedNetwork = true;        
+        Application.LoadLevel(levelName);        
     }
 
 

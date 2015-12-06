@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 
 public class GameUtils {
 
@@ -171,4 +172,24 @@ public class GameUtils {
         return result;
     }
 
+    public static T GetCustomProperty<T>(PhotonView view, string property, T defaultValue)
+    {
+        if (view != null && view.owner != null && view.owner.customProperties.ContainsKey(property) == true)
+        {
+            return (T)view.owner.customProperties[property];
+        }
+
+        return defaultValue;
+    }
+
+    public static void SetCustomProperty<T>(PhotonView view, string property, T value)
+    {
+        if (view != null && view.owner != null)
+        {
+            ExitGames.Client.Photon.Hashtable prop = new ExitGames.Client.Photon.Hashtable();
+            prop.Add(property, value);
+
+            view.owner.SetCustomProperties(prop);
+        }
+    }
 }
