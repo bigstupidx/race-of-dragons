@@ -9,6 +9,7 @@ public class InGameNetworkManager : Photon.MonoBehaviour
     public Image itemHolder;
     public SkillController skillController;
     public ItemController itemController;
+    public Transform progressBar;
     [HideInInspector] public PlayerController playerController;
 
     void Start()
@@ -30,11 +31,14 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         playerController.controlable = true;
 
         skillHolder.sprite = playerController.imageOfSkill;
-
         skillController.player = playerController;
         skillController.timeCoolDown = playerController.dragonPropertie.timeCooldown;
 
         itemController.player = playerController;
+
+        GameObject avatar = PhotonNetwork.Instantiate("Avatar" + dragonType, Vector3.zero, Quaternion.identity, 0);
+        AvatarController avatarController = avatar.GetComponent<AvatarController>();
+        avatarController.SetPlayer(playerController);
     }
 
     void Update()

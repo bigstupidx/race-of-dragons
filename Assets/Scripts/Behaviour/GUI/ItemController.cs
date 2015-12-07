@@ -6,7 +6,8 @@ public enum Item
 {
     Shield = 0,
     SpeedUp,
-    Energy
+    Energy,
+    None
 }
 
 public class ItemController : MonoBehaviour
@@ -18,6 +19,9 @@ public class ItemController : MonoBehaviour
     public Sprite[] spriteItems;
 
     [HideInInspector] public PlayerController player;
+
+    private bool hasItem;
+    private Item currentItem;
 
 	// Use this for initialization
 	void Start ()
@@ -33,13 +37,24 @@ public class ItemController : MonoBehaviour
 
     public void RandomItem()
     {
-        int rand = Random.Range(0, spriteItems.Length);
-        itemImage.sprite = spriteItems[rand];
-        animator.SetBool("isDisappear", false);
+        if (hasItem == false)
+        {
+            int rand = Random.Range(0, spriteItems.Length);
+            currentItem = (Item)rand;
+            itemImage.sprite = spriteItems[rand];
+            animator.SetBool("isDisappear", false);
+            hasItem = true;
+        }
     }
 
     public void UseItem()
     {
-        animator.SetBool("isDisappear", true);
+        if (hasItem)
+        {
+            animator.SetBool("isDisappear", true);
+            hasItem = false;
+
+            player.UserItem(currentItem);
+        }
     }
 }

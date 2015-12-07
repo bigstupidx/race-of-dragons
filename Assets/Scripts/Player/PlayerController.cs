@@ -214,4 +214,9 @@ public class PlayerController : Photon.PunBehaviour
             iceAgeController.timeExist = 15;
         }
     }
+
+    internal void UserItem(Item currentItem)
+    {
+        Debug.Log("Use: " + currentItem.ToString());
+    }
 }
