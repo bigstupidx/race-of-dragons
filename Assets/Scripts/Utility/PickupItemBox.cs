@@ -145,6 +145,9 @@ public class PickupItemBox : Photon.MonoBehaviour, IPunObservable
         if (this.PickupIsMine)
         {
             Debug.Log("I picked up something");
+            GameObject itemHolder = GameObject.FindGameObjectWithTag("ItemHolder");
+            ItemController itemController = itemHolder.GetComponent<ItemController>();
+            itemController.RandomItem();
         }
         else
         {

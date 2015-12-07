@@ -6,7 +6,9 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 {
     public Text position;
     public Image skillHolder;
-    public Image itemHolder;    
+    public Image itemHolder;
+    public SkillController skillController;
+    public ItemController itemController;
     [HideInInspector] public PlayerController playerController;
 
     void Start()
@@ -28,6 +30,11 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         playerController.controlable = true;
 
         skillHolder.sprite = playerController.imageOfSkill;
+
+        skillController.player = playerController;
+        skillController.timeCoolDown = playerController.dragonPropertie.timeCooldown;
+
+        itemController.player = playerController;
     }
 
     void Update()
