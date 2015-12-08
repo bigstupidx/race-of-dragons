@@ -60,7 +60,14 @@ public class FireballController : Photon.PunBehaviour
             if (player.PlayerId == playerId)
                 return;
             
-            player.GetStateMachine().ChangeState<PlayerBurningState>();           
+            if (player.hasShield)
+            {
+
+            }
+            else
+            {
+                player.GetStateMachine().ChangeState<PlayerBurningState>();
+            }
         }
         else
         {

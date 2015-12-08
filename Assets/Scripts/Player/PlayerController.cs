@@ -174,7 +174,7 @@ public class PlayerController : Photon.PunBehaviour
         if (collision.tag.Equals("IceAge"))
         {
             IceAgeController iceAge = collision.transform.parent.GetComponent<IceAgeController>();
-            if (iceAge.ID != PlayerId)
+            if (iceAge.ID != PlayerId && hasShield == false)
                 isSlow = true;
         }
     }
