@@ -6,9 +6,10 @@ public class SkillController : MonoBehaviour
 {
     public float timeCoolDown = 30;
     public Text textTime;
-    public Image mask;
-    public bool canUse;
-    public PlayerController player;
+    public Image mask;    
+    public GameTimeController gameTime;
+    [HideInInspector] public bool canUse;
+    [HideInInspector] public PlayerController player;
 
     private float timer;
     private Button button;
@@ -23,19 +24,26 @@ public class SkillController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        timer += Time.deltaTime;
-        if (timer >= timeCoolDown)
+        if (gameTime.isStart)
         {
-            mask.enabled = false;
-            canUse = true;
-            textTime.text = "";
-            button.enabled = true;
+            timer += Time.deltaTime;
+            if (timer >= timeCoolDown)
+            {
+                mask.enabled = false;
+                canUse = true;
+                textTime.text = "";
+                button.enabled = true;
+            }
+            else
+            {
+                textTime.text = (int)(timeCoolDown - timer) + "s";
+            }
         }
         else
         {
             textTime.text = (int)(timeCoolDown - timer) + "s";
         }
-	}
+    }
 
     public void Reset()
     {

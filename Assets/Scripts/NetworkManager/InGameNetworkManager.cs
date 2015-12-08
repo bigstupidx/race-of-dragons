@@ -9,7 +9,8 @@ public class InGameNetworkManager : Photon.MonoBehaviour
     public Image itemHolder;
     public SkillController skillController;
     public ItemController itemController;
-    public Transform progressBar;
+    public GameObject timeCountDown;
+    
     [HideInInspector] public PlayerController playerController;
 
     void Start()
@@ -28,7 +29,7 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         smoothCamera.target = player;
 
         playerController = player.GetComponent<PlayerController>();
-        playerController.controlable = true;
+        //playerController.controlable = true;
 
         skillHolder.sprite = playerController.imageOfSkill;
         skillController.player = playerController;        

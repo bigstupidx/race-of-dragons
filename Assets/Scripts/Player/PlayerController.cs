@@ -159,6 +159,8 @@ public class PlayerController : Photon.PunBehaviour
         stateMachine.Update(Time.deltaTime);
 
         speedAngle = Mathf.Min(speedAngle, maxSpeedAngle);
+
+        PosX = transform.position.x;
     }
 
     public void OnCollisionEnter2D(Collision2D other)

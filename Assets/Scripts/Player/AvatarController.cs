@@ -23,8 +23,8 @@ public class AvatarController : Photon.PunBehaviour
         // update posX
         if (inited)
         {
-            float playerPosX = GameUtils.GetCustomProperty<float>(playerView, "POS_X", 0);
-            float posX = (playerPosX / mapWidth) * ratio - ratio * 0.5f;            
+            float playerPosX = GameUtils.GetCustomProperty<float>(playerView, "POS_X", 0);            
+            float posX = (playerPosX / mapWidth) * ratio - ratio * 0.5f;
             rectTransform.localPosition = new Vector3(posX, 0, 0);
         }
 	}
