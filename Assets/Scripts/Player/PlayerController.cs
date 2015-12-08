@@ -239,5 +239,10 @@ public class PlayerController : Photon.PunBehaviour
         {
             speedAngle *= 1.5f;
         }
+
+        if (currentItem == Item.Rocket)
+        {
+            GameObject rocket = PhotonNetwork.Instantiate("Rocket", skillPlaceHolder.position, skillPlaceHolder.rotation, 0) as GameObject;
+        }
     }
 }

@@ -7,7 +7,7 @@ public enum Item
     Shield = 0,
     SpeedUp,
     Energy,
-    None
+    Rocket
 }
 
 public class ItemController : MonoBehaviour
