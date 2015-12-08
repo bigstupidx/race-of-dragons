@@ -139,7 +139,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
     {
         ErrorDialog = "Error: Can't join random room (none found).";
         Debug.Log("OnPhotonRandomJoinFailed got called. Happens if no room is available (or all full or invisible or closed). JoinrRandom filter-options can limit available rooms.");
-        PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 3 }, TypedLobby.Default);
+        PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 1 }, TypedLobby.Default);
     }
 
     public void OnCreatedRoom()

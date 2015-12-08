@@ -15,7 +15,7 @@ public class PlayerThunderBoostState : IState<PlayerController>
 
     public override void Begin()
     {
-        context.speedAngle = 13;   
+        context.speedAngle = context.maxSpeedAngle;   
         body = context.body;
         
         float alpha = GameUtils.Instance.DegreeToRadian(context.transform.rotation.eulerAngles.z);

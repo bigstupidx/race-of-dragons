@@ -31,8 +31,9 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         playerController.controlable = true;
 
         skillHolder.sprite = playerController.imageOfSkill;
-        skillController.player = playerController;
+        skillController.player = playerController;        
         skillController.timeCoolDown = playerController.dragonPropertie.timeCooldown;
+        playerController.skillController = skillController;
 
         itemController.player = playerController;
 

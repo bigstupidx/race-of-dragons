@@ -65,8 +65,11 @@ public class PlayerController : Photon.PunBehaviour
 
     [Header("Skills")]
     public Transform skillPlaceHolder;
-    public bool isSlow;
+    [HideInInspector] public SkillController skillController;
     public Sprite imageOfSkill;
+    [HideInInspector] public bool hasShield; 
+
+    private bool isSlow;
 
     #region Get & Set
 
@@ -136,7 +139,6 @@ public class PlayerController : Photon.PunBehaviour
 
     void Update()
     {
-
         if (!controlable)
             return;
 
@@ -144,6 +146,7 @@ public class PlayerController : Photon.PunBehaviour
             Time.timeScale = 0.5f;
         else
             Time.timeScale = 1.0f;
+
         // test skill
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -218,5 +221,23 @@ public class PlayerController : Photon.PunBehaviour
     internal void UserItem(Item currentItem)
     {
         Debug.Log("Use: " + currentItem.ToString());
+        if (currentItem == Item.Shield)
+        {
+            GameObject shield = PhotonNetwork.Instantiate("BubbleShield", transform.position, Quaternion.identity, 0) as GameObject;            
+            hasShield = true;
+        }
+
+        if (currentItem == Item.Energy)
+        {
+            if (skillController != null)
+            {
+                skillController.ReduceTimeCoolDown(5); // defaul is 5 sec
+            }
+        }
+
+        if (currentItem == Item.SpeedUp)
+        {
+            speedAngle *= 1.5f;
+        }
     }
 }

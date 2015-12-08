@@ -49,4 +49,9 @@ public class SkillController : MonoBehaviour
     {
         player.UserSkill();
     }
+
+    public void ReduceTimeCoolDown(float time)
+    {
+        timer += time;
+    }
 }
