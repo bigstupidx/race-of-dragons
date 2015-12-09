@@ -78,10 +78,10 @@ public class PlayerController : Photon.PunBehaviour
     [HideInInspector] public SkillController skillController;
     public Sprite imageOfSkill;
     [HideInInspector] public bool hasShield;
-    public PlayerState playerState;
+    [HideInInspector] public PlayerState playerState;
+    [HideInInspector] public Vector3 safePos;
 
     private bool isSlow;
-
     private float timer;
 
     #region Get & Set
@@ -190,13 +190,13 @@ public class PlayerController : Photon.PunBehaviour
 
         speedAngle = Mathf.Min(speedAngle, maxSpeedAngle);
 
-        PosX = transform.position.x;
+        //PosX = transform.position.x;
 
         timer += Time.deltaTime;
         if (timer >= 2 && playerState == PlayerState.Flying && transform.position.y > 0)
         {
             timer = 0;
-            PrevPos = transform.position;
+            safePos = transform.position;
         }
 
         if (transform.position.y < -10)
@@ -297,7 +297,7 @@ public class PlayerController : Photon.PunBehaviour
 
     public void ResetPosition()
     {
-        transform.position = PrevPos;
+        transform.position = safePos;
         stateMachine.ChangeState<PlayerWaitingState>();
     }
 }
