@@ -46,6 +46,7 @@ public class PlayerFlyState : IState<PlayerController>
             alpha = GameUtils.Instance.CalculateAlpha(body.velocity.x, body.velocity.y);
         else
             alpha = 0;
+
         vel = CalculateForce(context.speedAngle, alpha + speedAlpha * deltaTime);
         body.velocity = vel;
         context.speedAngle += 2 * deltaTime;        

@@ -16,7 +16,8 @@ public enum PlayerState
     Failing,
     Running,
     Burning,
-    Slowing
+    Slowing,
+    FallInWater
 }
 
 [Serializable]
@@ -81,6 +82,8 @@ public class PlayerController : Photon.PunBehaviour
 
     private bool isSlow;
 
+    private float timer;
+
     #region Get & Set
 
     public StateMachine<PlayerController> GetStateMachine()
@@ -108,6 +111,18 @@ public class PlayerController : Photon.PunBehaviour
             GameUtils.SetCustomProperty<float>(photonView, "POS_X", value);
         }
     }
+
+    public Vector3 PrevPos
+    {
+        get
+        {
+            return GameUtils.GetCustomProperty<Vector3>(photonView, "PREV_POS", Vector3.zero);
+        }
+        set
+        {
+            GameUtils.SetCustomProperty<Vector3>(photonView, "PREV_POS", value);
+        }
+    }
     #endregion
 
     private float CalculateAlpha(float x, float y)
@@ -122,14 +137,16 @@ public class PlayerController : Photon.PunBehaviour
     void Awake()
     {
         // create new state machine
-        stateMachine = new StateMachine<PlayerController>(this, new PlayerWaitingState());
+        stateMachine = new StateMachine<PlayerController>(this, new PlayerInitState());
 
         // add all of states to state machine so that we can switch to them
+        stateMachine.AddState(new PlayerWaitingState());
         stateMachine.AddState(new PlayerFlyState());
         stateMachine.AddState(new PlayerFallState());
         stateMachine.AddState(new PlayerRunState());
         stateMachine.AddState(new PlayerBurningState());
         stateMachine.AddState(new PlayerThunderBoostState());
+        stateMachine.AddState(new PlayerFallInWaterState());
 
         stateMachine.ChangeState<PlayerWaitingState>();
         // listen for state changes
@@ -174,6 +191,18 @@ public class PlayerController : Photon.PunBehaviour
         speedAngle = Mathf.Min(speedAngle, maxSpeedAngle);
 
         PosX = transform.position.x;
+
+        timer += Time.deltaTime;
+        if (timer >= 2 && playerState == PlayerState.Flying && transform.position.y > 0)
+        {
+            timer = 0;
+            PrevPos = transform.position;
+        }
+
+        if (transform.position.y < -10)
+        {
+            ResetPosition();
+        }
     }
 
     public void OnCollisionEnter2D(Collision2D other)
@@ -192,6 +221,11 @@ public class PlayerController : Photon.PunBehaviour
             if (iceAge.ID != PlayerId && hasShield == false)
                 isSlow = true;
         }
+        else if (collision.tag.Equals("Water"))
+        {
+            stateMachine.ChangeState<PlayerFallInWaterState>();
+        }
+        
     }
 
     public void OnTriggerExit2D(Collider2D collision)
@@ -259,5 +293,11 @@ public class PlayerController : Photon.PunBehaviour
         {
             GameObject rocket = PhotonNetwork.Instantiate("Rocket", skillPlaceHolder.position, skillPlaceHolder.rotation, 0) as GameObject;
         }
+    }
+
+    public void ResetPosition()
+    {
+        transform.position = PrevPos;
+        stateMachine.ChangeState<PlayerWaitingState>();
     }
 }

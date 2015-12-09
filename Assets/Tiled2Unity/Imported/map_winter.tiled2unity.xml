@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <!--Tiled2Unity generated xml data-->
 <!--Do not modify by hand-->
-<!--Last exported: 09/12/2015 10:57:09 AM-->
+<!--Last exported: 09/12/2015 10:26:52 PM-->
 <Tiled2Unity version="0.9.13.0">
   <AssignMaterial mesh="mesh_[00]_[06]" material="Sign_2" sortingLayerName="" sortingOrder="0" />
   <AssignMaterial mesh="mesh_[00]_[08]" material="Stone" sortingLayerName="" sortingOrder="0" />
@@ -28,6 +28,22 @@
       <GameObject copy="mesh_[00]_[01]" opacity="1" />
       <GameObject copy="mesh_[00]_[03]" opacity="1" />
       <GameObject copy="mesh_[00]_[04]" opacity="1" />
+      <GameObject name="Collision">
+        <PolygonCollider2D>
+          <Path>21758,-2369 20478,-2369 20478,-2430 21758,-2430</Path>
+          <Path>38654,-3582 46590,-3582 46590,-3521 38654,-3521</Path>
+          <Path>34814,-3582 37886,-3582 37886,-3521 34814,-3521</Path>
+          <Path>31358,-3582 32638,-3582 32638,-3521 31358,-3521</Path>
+          <Path>26110,-3582 29182,-3582 29182,-3521 26110,-3521</Path>
+          <Path>18814,-3582 23806,-3582 23806,-3521 18814,-3521</Path>
+          <Path>14334,-3582 16894,-3582 16894,-3521 14334,-3521</Path>
+          <Path>8574,-3582 11006,-3582 11006,-3521 8574,-3521</Path>
+          <Path>4862,-3582 8062,-3582 8062,-3521 4862,-3521</Path>
+          <Path>2046,-3582 3198,-3582 3198,-3521 2046,-3521</Path>
+          <Path>3198,-3649 3070,-3649 3070,-3710 3198,-3710</Path>
+          <Path>2174,-3649 2046,-3649 2046,-3710 2174,-3710</Path>
+        </PolygonCollider2D>
+      </GameObject>
     </GameObject>
     <GameObject name="Platform_01" x="0" y="0">
       <GameObject copy="mesh_[01]_[00]" opacity="1" />
