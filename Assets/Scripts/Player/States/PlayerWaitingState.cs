@@ -16,6 +16,7 @@ public class PlayerWaitingState : IState<PlayerController>
         {
             context.body.gravityScale = 0;
             context.body.velocity = Vector2.zero;
+            context.body.angularVelocity = 0;
         }
         
         if (context.animator != null)
