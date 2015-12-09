@@ -10,6 +10,15 @@ public enum Element
     Thunder
 }
 
+public enum PlayerState
+{
+    Flying,
+    Failing,
+    Running,
+    Burning,
+    Slowing
+}
+
 [Serializable]
 public class DragonPropertie
 {
@@ -67,7 +76,8 @@ public class PlayerController : Photon.PunBehaviour
     public Transform skillPlaceHolder;
     [HideInInspector] public SkillController skillController;
     public Sprite imageOfSkill;
-    [HideInInspector] public bool hasShield; 
+    [HideInInspector] public bool hasShield;
+    public PlayerState playerState;
 
     private bool isSlow;
 
@@ -153,9 +163,12 @@ public class PlayerController : Photon.PunBehaviour
             UserSkill();
         }
 
-        alpha = CalculateAlpha(body.velocity.x, body.velocity.y);
-        transform.rotation = Quaternion.Euler(0, 0, alpha);
-
+        if (playerState != PlayerState.Running)
+        {
+            alpha = CalculateAlpha(body.velocity.x, body.velocity.y);
+            transform.rotation = Quaternion.Euler(0, 0, alpha);
+        }
+        
         stateMachine.Update(Time.deltaTime);
 
         speedAngle = Mathf.Min(speedAngle, maxSpeedAngle);

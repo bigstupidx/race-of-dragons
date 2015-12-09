@@ -15,6 +15,7 @@ public class PlayerBurningState : IState<PlayerController>
 
     public override void Begin()
     {
+        context.playerState = PlayerState.Burning;
         body = context.body;
         body.gravityScale = 1f;
         canControl = false;

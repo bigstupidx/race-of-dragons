@@ -192,4 +192,22 @@ public class GameUtils {
             view.owner.SetCustomProperties(prop);
         }
     }
+
+    public static void SetRoomCustomProperty<T>(string property, T value)
+    {
+        ExitGames.Client.Photon.Hashtable prop = new ExitGames.Client.Photon.Hashtable();
+        prop.Add(property, value);
+
+        PhotonNetwork.room.SetCustomProperties(prop);
+    }
+
+    public static T GetRoomCustomProperty<T>(string property, T defaultValue)
+    {
+        if (PhotonNetwork.room.customProperties.ContainsKey(property))
+        {
+            return (T)PhotonNetwork.room.customProperties[property];
+        }
+
+        return defaultValue;
+    }
 }

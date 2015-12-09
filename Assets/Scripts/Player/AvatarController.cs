@@ -4,10 +4,10 @@ using UnityEngine.UI;
 
 public class AvatarController : Photon.PunBehaviour
 {
-    [HideInInspector] public PlayerController player;
-    public float mapWidth = 360.0f;
+    [HideInInspector] public PlayerController player;    
     public Image arrow;
 
+    private float mapWidth = 490.0f;
     private float ratio = 650.0f;
     private RectTransform rectTransform;
     private PhotonView playerView;

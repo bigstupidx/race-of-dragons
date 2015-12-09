@@ -3,31 +3,29 @@ using System.Collections;
 
 public class BackgroundParalaxController : MonoBehaviour
 {
-    private Camera cam;
-    private float lastCamPosX;
-    private float ratioSpeed = 0.8f;
-    private float minDistanceToMove = 0.5f;
-    private Vector3 correctPos;
+    private Transform cam;
+    private Vector3 previousCamPos;
 
-    private float smoothTime = 0.2f;
-    private Vector3 velocity = Vector3.zero;
-
+    private float parallaxScale = -10f;
+    private float smoothing = 2f;
+    
+    void Awake()
+    {
+        cam = Camera.main.transform;
+    }
 
     void Start()
     {
-        cam = Camera.main;
-        lastCamPosX = cam.transform.position.x;
-        correctPos = transform.position;
+        previousCamPos = cam.position;
     }
 
     void Update()
     {
-        float distanceX = cam.transform.position.x - lastCamPosX;
-        if (distanceX >= minDistanceToMove)
-        {
-            correctPos += new Vector3(distanceX * ratioSpeed, 0, 0);
-            lastCamPosX = cam.transform.position.x;           
-        }        
-        transform.position = Vector3.SmoothDamp(transform.position, correctPos, ref velocity, smoothTime);
-    }  
+        float parallax = (previousCamPos.x - cam.position.x) * parallaxScale;
+        float backgroundTargetPosX = transform.position.x + parallax;
+        Vector3 backgroundTargetPos = new Vector3(backgroundTargetPosX, transform.position.y, transform.position.z);
+        transform.position = Vector3.Lerp(transform.position, backgroundTargetPos, smoothing * Time.deltaTime);
+
+        previousCamPos = cam.position;
+    }
 }

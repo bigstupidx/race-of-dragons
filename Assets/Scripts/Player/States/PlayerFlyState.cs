@@ -26,6 +26,7 @@ public class PlayerFlyState : IState<PlayerController>
 
     public override void Begin()
     {
+        context.playerState = PlayerState.Flying;
         body = context.body;
         body.gravityScale = 0;
         context.animator.SetBool("isFlying", true);       
@@ -41,7 +42,10 @@ public class PlayerFlyState : IState<PlayerController>
 
     public override void Update(float deltaTime)
     {
-        alpha = GameUtils.Instance.CalculateAlpha(body.velocity.x, body.velocity.y);
+        if (body.velocity.normalized.x != -1)
+            alpha = GameUtils.Instance.CalculateAlpha(body.velocity.x, body.velocity.y);
+        else
+            alpha = 0;
         vel = CalculateForce(context.speedAngle, alpha + speedAlpha * deltaTime);
         body.velocity = vel;
         context.speedAngle += 2 * deltaTime;        

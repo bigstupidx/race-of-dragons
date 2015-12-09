@@ -183,9 +183,15 @@ public class RandomMatchMaker : Photon.MonoBehaviour
                 if (timeCountDown >= GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY)
                 {
                     PhotonNetwork.room.visible = false;
+
                     if (PhotonNetwork.isMasterClient)
+                    {
+                        int rand = Random.Range(0, 4);
+                        GameUtils.SetRoomCustomProperty<int>("MAP_ID", rand);
                         PhotonNetwork.LoadLevel("Scene_Game");
-                    timeCountDown = GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY;
+                    }
+                        
+                    timeCountDown = GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY;                    
                 }                
             }
         }

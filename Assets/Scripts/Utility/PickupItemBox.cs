@@ -47,12 +47,10 @@ public class PickupItemBox : Photon.MonoBehaviour, IPunObservable
 
     public static HashSet<PickupItemBox> DisabledPickupItems = new HashSet<PickupItemBox>();
 
-
-    public void OnTriggerEnter2D(Collider2D other)
+    public void OnTriggerExit2D(Collider2D other)
     {
         // we only call Pickup() if "our" character collides with this PickupItem.
-        // note: if you "position" remote characters by setting their translation, triggers won't be hit.
-
+        // note: if you "position" remote characters by setting their translation, triggers won't be hit.        
         PhotonView otherpv = other.GetComponent<PhotonView>();
         if (this.PickupOnTrigger && otherpv != null && otherpv.isMine)
         {
@@ -61,10 +59,18 @@ public class PickupItemBox : Photon.MonoBehaviour, IPunObservable
         }
     }
 
-    public void OnMouseDown()
-    {
-        this.Pickup();
-    }
+    //public void OnTriggerEnter2D(Collider2D other)
+    //{
+    //    // we only call Pickup() if "our" character collides with this PickupItem.
+    //    // note: if you "position" remote characters by setting their translation, triggers won't be hit.
+    //    Debug.Log("PICKUP");
+    //    PhotonView otherpv = other.GetComponent<PhotonView>();
+    //    if (this.PickupOnTrigger && otherpv != null && otherpv.isMine)
+    //    {
+    //        //Debug.Log("OnTriggerEnter() calls Pickup().");
+    //        this.Pickup();
+    //    }
+    //}
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
@@ -153,7 +159,7 @@ public class PickupItemBox : Photon.MonoBehaviour, IPunObservable
         {
             Debug.Log("Someone else picked up something");
         }
-        
+
         // setup a respawn (or none, if the item has to be dropped)
         if (SecondsBeforeRespawn <= 0)
         {
@@ -214,7 +220,7 @@ public class PickupItemBox : Photon.MonoBehaviour, IPunObservable
 
         if (this.gameObject != null)
         {
-            this.gameObject.SetActive(true);           
+            this.gameObject.SetActive(true);
         }
     }
 }
