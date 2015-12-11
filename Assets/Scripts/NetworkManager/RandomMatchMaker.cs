@@ -102,13 +102,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
     {
         Debug.Log("OnJoinedRoom");
         joined = true;
-        //string dragonType = PlayerData.Current.CurrentDragon.element.ToString() + "Dragon";
-        Element randomElement = (Element)Random.Range(0, 3);
-        //Element randomElement = Element.Ice;
-        string dragonType = randomElement.ToString();
-
-        PlayerData.Current.CurrentDragon.element = randomElement;
-        PlayerData.Current.Save();
+        string dragonType = PlayerData.Current.CurrentDragon.element.ToString();        
 
         string dragonPrefab = dragonType + "Dragon";
         GameObject player = PhotonNetwork.Instantiate(dragonPrefab, cardHolders[PhotonNetwork.playerList.Length - 1].position, Quaternion.identity, 0);          

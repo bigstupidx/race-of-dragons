@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System;
+using System.Collections.Generic;
 
 public enum Item
 {
@@ -8,6 +10,39 @@ public enum Item
     SpeedUp,
     Energy,
     Rocket
+}
+
+[Serializable]
+public class ItemPropertie
+{
+    public Item item;
+    public int level = 1;
+
+    public ItemPropertie()
+    {
+        
+    }
+
+    public ItemPropertie(Item item)
+    {
+        this.item = item;
+    }
+
+    public ItemPropertie(IDictionary<string, object> data)
+    {
+        level = int.Parse(data["level"].ToString());        
+        item = (Item)(int.Parse(data["item"].ToString()));
+    }
+
+    public Dictionary<string, object> ToDictionary()
+    {
+        Dictionary<string, object> result = new Dictionary<string, object>();
+        result.Add("level", level);
+        result.Add("element", (int)item);
+
+        return result;
+    }
+
 }
 
 public class ItemController : MonoBehaviour
@@ -42,7 +77,7 @@ public class ItemController : MonoBehaviour
     {
         if (hasItem == false)
         {
-            int rand = Random.Range(0, spriteItems.Length);
+            int rand = UnityEngine.Random.Range(0, spriteItems.Length);
             currentItem = (Item)rand;
             itemImage.enabled = true;
             itemImage.sprite = spriteItems[rand];

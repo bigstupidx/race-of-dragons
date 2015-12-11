@@ -37,10 +37,11 @@ public class PlayerData
     public int level;
     public int exp;
     public int elo;
-    public int gold;
+    public int gold = 100;
+    public int gems;
 
     public Dictionary<string, DragonPropertie> dragons;
-    public Dictionary<string, object> items;
+    public Dictionary<string, ItemPropertie> items;
     public string currentDragonIndex;
 
     #endregion
@@ -63,6 +64,12 @@ public class PlayerData
         gold = 0;
         elo = 0;
 
+        InitDragons();
+        InitItems();
+    }
+
+    private void InitDragons()
+    {
         dragons = new Dictionary<string, DragonPropertie>();
         DragonPropertie fireDragon = new DragonPropertie();
         dragons.Add(fireDragon.element.ToString(), fireDragon);
@@ -70,6 +77,14 @@ public class PlayerData
         currentDragonIndex = fireDragon.element.ToString();
     }
 
+    private void InitItems()
+    {
+        items = new Dictionary<string, ItemPropertie>();
+        items.Add(Item.Shield.ToString(), new ItemPropertie(Item.Shield));
+        items.Add(Item.SpeedUp.ToString(), new ItemPropertie(Item.SpeedUp));
+        items.Add(Item.Energy.ToString(), new ItemPropertie(Item.Energy));
+        items.Add(Item.Rocket.ToString(), new ItemPropertie(Item.Rocket));
+    }
     #region Save & Load
 
     private string FilePath()

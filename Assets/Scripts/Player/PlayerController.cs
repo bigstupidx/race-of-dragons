@@ -26,13 +26,18 @@ public class DragonPropertie
     public int level = 1;
     public int energy = 100;
     public int exp;
-    public Element element = Element.Fire;
+    public Element element;
     public float timeCooldown = 30;
     public int speedRecoverEnergy = 3; // per second
 
     public DragonPropertie()
     {
+        element = (Element)(UnityEngine.Random.Range(0, 3));
+    }
 
+    public DragonPropertie(Element ele)
+    {
+        element = ele;
     }
 
     public DragonPropertie(IDictionary<string, object> data)
