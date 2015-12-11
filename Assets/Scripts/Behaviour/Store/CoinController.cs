@@ -14,6 +14,7 @@ public class CoinController : Singleton<CoinController>
     public void SetCoins(int coinsValue)
     {
         PlayerData.Current.gold = coinsValue;
+        PlayerData.Current.Save();
         coins.number = PlayerData.Current.gold;
     }
 }

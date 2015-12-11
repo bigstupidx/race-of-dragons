@@ -37,11 +37,12 @@ public class PlayerData
     public int level;
     public int exp;
     public int elo;
-    public int gold = 100;
+    public int gold;
     public int gems;
 
     public Dictionary<string, DragonPropertie> dragons;
     public Dictionary<string, ItemPropertie> items;
+    public Dictionary<string, string> chats;
     public string currentDragonIndex;
 
     #endregion
@@ -61,11 +62,13 @@ public class PlayerData
     {
         level = 1;
         exp = 0;
-        gold = 0;
+        gold = 1000;
+        gems = 1;
         elo = 0;
 
         InitDragons();
         InitItems();
+        InitChat();
     }
 
     private void InitDragons()
@@ -84,6 +87,16 @@ public class PlayerData
         items.Add(Item.SpeedUp.ToString(), new ItemPropertie(Item.SpeedUp));
         items.Add(Item.Energy.ToString(), new ItemPropertie(Item.Energy));
         items.Add(Item.Rocket.ToString(), new ItemPropertie(Item.Rocket));
+    }
+
+    private void InitChat()
+    {
+        chats = new Dictionary<string, string>();
+        var chatModel = GameModel.Instance.chatConfig;
+        foreach (var item in chatModel)
+        {
+            chats.Add(item.Key.ToString(), item.Value);
+        }
     }
     #region Save & Load
 

@@ -12,6 +12,7 @@ public class ViewportController : MonoBehaviour
 
     public void OnPrev()
     {
+        scroll = GetComponentInChildren<ScrollListController>();
         if (scroll != null)
         {
             scroll.OnPrev();
@@ -20,6 +21,7 @@ public class ViewportController : MonoBehaviour
 
     public void OnNext()
     {
+        scroll = GetComponentInChildren<ScrollListController>();
         if (scroll != null)
         {
             scroll.OnNext();

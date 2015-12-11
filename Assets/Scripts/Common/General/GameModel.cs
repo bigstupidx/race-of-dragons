@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class GameModel
 {
@@ -26,6 +27,7 @@ public class GameModel
     public Dictionary<Item, Dictionary<string, object>> shopItemConfig;
     public Dictionary<Element, Dictionary<int, float>> dragonLevelConfig;
     public Dictionary<Item, Dictionary<int, float>> itemLevelConfig;
+    public Dictionary<Emoji, string> chatConfig;
 
     public void Load()
     {
@@ -33,6 +35,25 @@ public class GameModel
         LoadShopItemConfig();
         LoadDragonLevelConfig();
         LoadItemLevelConfig();
+        LoadChatConfig();
+    }
+
+    private void LoadChatConfig()
+    {
+        chatConfig = new Dictionary<Emoji, string>();
+        TextAsset assetpoint = Resources.Load("Data/chat_default_config") as TextAsset;
+
+        string[] data = assetpoint.text.Split('\n');
+        string[] strarr;
+        
+        for (int i = 1; i < data.Length; i++)
+        {
+            if (data[i] == "") break;
+
+            strarr = data[i].Split(',');
+            Emoji emoji = (Emoji)(int.Parse(strarr[0]));
+            chatConfig.Add(emoji, strarr[1]);
+        }
     }
 
     public void LoadShopDragonConfig()

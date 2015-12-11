@@ -122,7 +122,7 @@ public class BonusItemController : MonoBehaviour
 
         if (itemInfo.useGem)
         {
-            //if (PlayerData.Current.gems > itemInfo.Price)
+            if (PlayerData.Current.gems > itemInfo.Price)
             {
                 PlayerData.Current.gems -= itemInfo.Price;
                 GemController.Instance.SetGems(PlayerData.Current.gems);
@@ -131,10 +131,14 @@ public class BonusItemController : MonoBehaviour
                 itemInfo.Save();
                 Reload();
             }
+            else // not enough gems
+            {
+                WarningDialogController.Instance.ShowNotEnoughGems();
+            }
         }
         else
         {
-            //if (PlayerData.Current.gold > itemInfo.Price)
+            if (PlayerData.Current.gold > itemInfo.Price)
             {
                 PlayerData.Current.gold -= itemInfo.Price;
                 CoinController.Instance.SetCoins(PlayerData.Current.gold);
@@ -142,6 +146,10 @@ public class BonusItemController : MonoBehaviour
                 itemInfo.Level = newLevel;
                 itemInfo.Save();
                 Reload();
+            }
+            else // not enough coins
+            {
+                WarningDialogController.Instance.ShowNotEnoughCoins();
             }
         }
     }   
