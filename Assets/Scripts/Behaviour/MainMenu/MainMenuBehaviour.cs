@@ -4,7 +4,9 @@ using System.Collections;
 public class MainMenuBehaviour : MonoBehaviour {
 
     public GameObject optionDialog;
-    public GameObject friendDialog;
+    public GameObject friendDialogPrefab;
+
+    private FriendDialogController friendDialog;
 
     #region UI Delegate
     public void OnOptionClick()
@@ -19,7 +21,16 @@ public class MainMenuBehaviour : MonoBehaviour {
 
     public void OnFriendsClick()
     {
-        Instantiate(friendDialog);
+        if (friendDialog != null)
+        {
+            friendDialog.Show();
+        }
+        else
+        {
+            GameObject go = Instantiate(friendDialogPrefab) as GameObject;
+            friendDialog = go.GetComponentInChildren<FriendDialogController>();
+        }
+
     }
 
     public void OnRaceClick()

@@ -43,6 +43,7 @@ public class PlayerData
     public Dictionary<string, DragonPropertie> dragons;
     public Dictionary<string, ItemPropertie> items;
     public Dictionary<string, string> chats;
+    public Dictionary<string, FriendItem> friends;
     public string currentDragonIndex;
 
     #endregion
@@ -69,6 +70,7 @@ public class PlayerData
         InitDragons();
         InitItems();
         InitChat();
+        GetFriendsList();
     }
 
     private void InitDragons()
@@ -96,6 +98,15 @@ public class PlayerData
         foreach (var item in chatModel)
         {
             chats.Add(item.Key.ToString(), item.Value);
+        }
+    }
+
+    private void GetFriendsList()
+    {
+        friends = new Dictionary<string, FriendItem>();
+        for (int i = 0; i < 10; i++)
+        {
+            friends.Add(i + "", new FriendItem());
         }
     }
     #region Save & Load

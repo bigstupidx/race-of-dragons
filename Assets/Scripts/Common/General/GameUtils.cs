@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using ExitGames.Client.Photon;
+using UnityEngine.UI;
 
 public class GameUtils {
 
@@ -209,5 +210,16 @@ public class GameUtils {
         }
 
         return defaultValue;
+    }
+
+    public IEnumerator _DownloadImage(string url, Image avatar)
+    {
+        Texture2D texture = new Texture2D(1, 1);
+        WWW www = new WWW(url);
+        yield return www;
+        www.LoadImageIntoTexture(texture);
+
+        Sprite image = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        avatar.sprite = image;
     }
 }
