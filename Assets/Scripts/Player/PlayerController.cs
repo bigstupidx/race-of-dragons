@@ -23,12 +23,9 @@ public enum PlayerState
 [Serializable]
 public class DragonPropertie
 {
-    public int level = 1;
-    public int energy = 100;
-    public int exp;
+    public int level = 1;     
     public Element element;
-    public float timeCooldown = 30;
-    public int speedRecoverEnergy = 3; // per second
+    public float timeCooldown = 30;  
 
     public DragonPropertie()
     {
@@ -42,18 +39,14 @@ public class DragonPropertie
 
     public DragonPropertie(IDictionary<string, object> data)
     {        
-        level = int.Parse(data["level"].ToString());
-        energy = int.Parse(data["energy"].ToString());
-        exp = int.Parse(data["exp"].ToString());
+        level = int.Parse(data["level"].ToString());       
         element = (Element)(int.Parse(data["element"].ToString()));
     }
 
     public Dictionary<string, object> ToDictionary()
     {
         Dictionary<string, object> result = new Dictionary<string, object>();
-        result.Add("level", level);
-        result.Add("energy", energy);
-        result.Add("exp", exp);
+        result.Add("level", level);      
         result.Add("element", (int)element);
 
         return result;

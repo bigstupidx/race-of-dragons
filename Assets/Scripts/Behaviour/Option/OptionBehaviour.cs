@@ -66,7 +66,7 @@ public class OptionBehaviour : MonoBehaviour {
 
     public void Start()
     {
-
+        username.text = PlayerData.Current.name;
     } 
     #endregion
 

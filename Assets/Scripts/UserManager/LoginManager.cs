@@ -133,6 +133,7 @@ public class LoginManager : MonoBehaviour {
         Dictionary<string, IEnumerator> listToDo = new Dictionary<string, IEnumerator>();
         listToDo.Add("Checking server...", _ConfirmLogin());
         listToDo.Add("Sync data ...", _SyncData());
+        listToDo.Add("Get friends list ...", _GetFriendList());
 
         loadingDialogBehaviour.SetUpToDoList(listToDo);
     }
@@ -166,6 +167,10 @@ public class LoginManager : MonoBehaviour {
     {
         if (ParseUser.CurrentUser != null)
         {
+            PlayerData.Current.id = ParseUser.CurrentUser.ObjectId;
+            PlayerData.Current.name = ParseUser.CurrentUser.Username;
+            PlayerData.Current.Save();
+
             var param = new Dictionary<string, object>();
             param.Add("data", PlayerData.Current.ToDictionary());
 
@@ -186,7 +191,29 @@ public class LoginManager : MonoBehaviour {
             }
         }
     }
-   
+
+    private IEnumerator _GetFriendList()
+    {
+        if (ParseUser.CurrentUser != null)
+        {
+            var taskSync = ParseCloud.CallFunctionAsync<IList<IDictionary<string, object>>>("getFriendList", null).ContinueWith(t2 =>
+            {
+                if (t2.IsCompleted)
+                {
+                    var friendList = t2.Result;
+                    PlayerData.Current.SetFriendList(friendList);
+                }
+            });
+
+            while (!taskSync.IsCompleted) yield return null;
+
+            if (!taskSync.IsFaulted && !taskSync.IsCanceled)
+            {
+                PlayerData.Current.Save();
+            }
+        }
+    }
+
     public void ShowSignUpScreen()
     {
         Instantiate(signUpDialogPrefab);

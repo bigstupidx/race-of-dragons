@@ -7,13 +7,13 @@ public class GemController : Singleton<GemController>
 	
 	void Start ()
     {
-        gems.number = PlayerData.Current.gems;
+        gems.number = PlayerData.Current.gem;
         gems.tmpNumber = gems.number;
 	}
 	
 	public void SetGems(int gemsValue)
     {
-        PlayerData.Current.gems = gemsValue;
+        PlayerData.Current.gem = gemsValue;
         gems.number = gemsValue;
     }
 }

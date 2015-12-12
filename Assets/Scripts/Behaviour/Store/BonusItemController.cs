@@ -122,10 +122,10 @@ public class BonusItemController : MonoBehaviour
 
         if (itemInfo.useGem)
         {
-            if (PlayerData.Current.gems > itemInfo.Price)
+            if (PlayerData.Current.gem > itemInfo.Price)
             {
-                PlayerData.Current.gems -= itemInfo.Price;
-                GemController.Instance.SetGems(PlayerData.Current.gems);
+                PlayerData.Current.gem -= itemInfo.Price;
+                GemController.Instance.SetGems(PlayerData.Current.gem);
                 int newLevel = itemInfo.Level + 1;
                 itemInfo.Level = newLevel;
                 itemInfo.Save();

@@ -1,25 +1,44 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 [Serializable]
 public class FriendItem
 {
+    public string Id { get; set; }
     public string Name { get; set; }
     public string AvatarUrl { get; set; }
     public int Level { get; set; }
     public DateTime? LastTimeAcess { get; set; }
     public int Rank { get; set; }
-    public int WinRate { get; set; }
+    public float WinRate { get; set; }
+    public int Played { get; set; }
+    public int Win { get; set; }
 
     public FriendItem()
     {
         Name = "User name";
         AvatarUrl = "http://res.cloudinary.com/thienle/image/upload/c_scale,r_30,w_128/v1449901077/Lord%20of%20Dragons/default_avatar.png";
         Level = 1;
-        LastTimeAcess = DateTime.Now;
+        LastTimeAcess = null;
         Rank = 0;
         WinRate = 0;
+        Played = 0;
+        Win = 0;
+    }
+
+    public FriendItem(IDictionary<string, object> data)
+    {
+        Id = data["id"].ToString();
+        Name = data["name"].ToString();
+        AvatarUrl = data["avatarUrl"].ToString();
+        Level = int.Parse(data["level"].ToString());
+        Rank = int.Parse(data["rank"].ToString());
+        Played = int.Parse(data["played"].ToString());
+        Win = int.Parse(data["win"].ToString());
+        if (Played > 0)
+            WinRate = Win / Played;
     }
 }
 

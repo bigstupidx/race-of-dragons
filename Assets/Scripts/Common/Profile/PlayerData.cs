@@ -34,16 +34,23 @@ public class PlayerData
 
     #region Variable
 
+    public string id;
+    public string name;
+
     public int level;
     public int exp;
     public int elo;
     public int gold;
-    public int gems;
+    public int gem;
+    public int played;
+    public int win;
 
     public Dictionary<string, DragonPropertie> dragons;
     public Dictionary<string, ItemPropertie> items;
-    public Dictionary<string, string> chats;
+    public Dictionary<string, string> chats;    
     public Dictionary<string, FriendItem> friends;
+    public List<string> friendList;
+
     public string currentDragonIndex;
 
     #endregion
@@ -60,17 +67,19 @@ public class PlayerData
     }
 
     public void InitDefaultData()
-    {
+    {        
         level = 1;
         exp = 0;
         gold = 1000;
-        gems = 1;
+        gem = 1;
         elo = 0;
+        played = 0;
+        win = 0;
 
         InitDragons();
         InitItems();
         InitChat();
-        GetFriendsList();
+        InitFriendList();
     }
 
     private void InitDragons()
@@ -101,12 +110,19 @@ public class PlayerData
         }
     }
 
-    private void GetFriendsList()
+    private void InitFriendList()
     {
+        friendList = new List<string>();
         friends = new Dictionary<string, FriendItem>();
-        for (int i = 0; i < 10; i++)
+    }
+
+    public void SetFriendList(IList<IDictionary<string, object>> list)
+    {
+        friends.Clear();
+        for (int i = 0; i < list.Count; i++)
         {
-            friends.Add(i + "", new FriendItem());
+            FriendItem friend = new FriendItem(list[i]);
+            friends.Add(friend.Id, friend);
         }
     }
     #region Save & Load
@@ -159,29 +175,51 @@ public class PlayerData
     {
         Dictionary<string, object> result = new Dictionary<string, object>();
 
+        result.Add("name", name);
         result.Add("level", level);
         result.Add("exp", exp);
         result.Add("elo", elo);
         result.Add("gold", gold);
+        result.Add("gem", gem);
+        result.Add("played", played);
+        result.Add("win", win);
 
         var dicDragons = new Dictionary<string, Dictionary<string, object>>();
-
         foreach (var item in dragons)
         {
             dicDragons.Add(item.Key.ToString(), item.Value.ToDictionary());
         }
         result.Add("dragons", dicDragons);
-        //result.Add("items", items);
+
+        var dicItems = new Dictionary<string, Dictionary<string, object>>();
+        foreach (var item in items)
+        {
+            dicItems.Add(item.Key.ToString(), item.Value.ToDictionary());
+        }
+        result.Add("items", dicItems);
+
+        result.Add("emojis", chats);
+
+        var friendList = new List<string>();
+        foreach (var item in friends)
+        {
+            friendList.Add(item.Key.ToString());
+        }
+        result.Add("friends", friendList);
 
         return result;
     }
 
     public void SyncData(ParseObject data)
     {
+        name = data.Get<string>("name");
         level = data.Get<int>("level");
         exp = data.Get<int>("exp");
         gold = data.Get<int>("gold");
         elo = data.Get<int>("elo");
+        gem = data.Get<int>("gem");
+        played = data.Get<int>("played");
+        win = data.Get<int>("win");
 
         var newDragons = data.Get<IDictionary<string, object>>("dragons");
         dragons.Clear();
@@ -190,5 +228,29 @@ public class PlayerData
             var dragon = new DragonPropertie((IDictionary<string, object>)item.Value);
             dragons.Add(item.Key, dragon);
         }
+
+        var newItems = data.Get<IDictionary<string, object>>("items");
+        items.Clear();
+        foreach (var item in newItems)
+        {
+            var itemProp = new ItemPropertie((IDictionary<string, object>)item.Value);
+            items.Add(item.Key, itemProp);
+        }
+
+        var newEmoji = data.Get<IDictionary<string, object>>("emojis");
+        chats.Clear();
+        foreach (var item in newEmoji)
+        {
+            chats.Add(item.Key, item.Value.ToString());
+        }
+
+        var newFriendList = data.Get<IList<string>>("friends");
+        friendList.Clear();
+        foreach (var item in newFriendList)
+        {
+            friendList.Add(item.ToString());
+        }
+
+        Save();
     }
 }
