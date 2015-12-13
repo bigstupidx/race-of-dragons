@@ -45,6 +45,7 @@ public class FriendItem
 public class FriendDialogController : Singleton<FriendDialogController>
 {
     public GameObject friendItem;
+    public GameObject moreFriendDialogPrefab;
     public GameObject contain;
 
     private Animator animator;    
@@ -52,6 +53,22 @@ public class FriendDialogController : Singleton<FriendDialogController>
 	void Start ()
     {
         animator = GetComponent<Animator>();
+        Reload();
+        Show();
+	}
+		
+	void Update ()
+    {
+	
+	}
+
+    public void Reload()
+    {
+        for (int i = 0; i < contain.transform.childCount; i++)
+        {
+            Destroy(contain.transform.GetChild(i).gameObject);
+        }
+
         var friendList = PlayerData.Current.friends;
         foreach (var item in friendList)
         {
@@ -61,14 +78,7 @@ public class FriendDialogController : Singleton<FriendDialogController>
             friend.transform.parent = contain.transform;
             friend.transform.localScale = new Vector3(1, 1, 1);
         }
-
-        Show();
-	}
-		
-	void Update ()
-    {
-	
-	}
+    }
 
     public void OnBackClick()
     {
@@ -79,5 +89,10 @@ public class FriendDialogController : Singleton<FriendDialogController>
     {
         animator.SetBool("isDisappear", false);
         animator.Play("friend_dialog_appear", -1, 0);
+    }
+
+    public void OnMoreFriendClick()
+    {
+        Instantiate(moreFriendDialogPrefab);
     }
 }
