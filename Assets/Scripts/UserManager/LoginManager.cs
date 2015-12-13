@@ -23,12 +23,47 @@ public class LoginManager : MonoBehaviour {
     {
         animator = GetComponent<Animator>();
 
-        FB.Init(delegate ()
-       {
-           Debug.Log("Init done!");
-       });
+        if (!FB.IsInitialized)
+        {
+            // Initialize the Facebook SDK
+            FB.Init(InitCallback, OnHideUnity);
+        }
+        else
+        {
+            // Already initialized, signal an app activation App Event
+            FB.ActivateApp();
+        }
     }
-    
+
+    private void InitCallback()
+    {
+        if (FB.IsInitialized)
+        {
+            // Signal an app activation App Event
+            FB.ActivateApp();
+            // Continue with Facebook SDK
+            // ...
+        }
+        else
+        {
+            Debug.Log("Failed to Initialize the Facebook SDK");
+        }
+    }
+
+    private void OnHideUnity(bool isGameShown)
+    {
+        if (!isGameShown)
+        {
+            // Pause the game - we will need to hide
+            Time.timeScale = 0;
+        }
+        else
+        {
+            // Resume the game - we're getting focus again
+            Time.timeScale = 1;
+        }
+    }
+
     void Start()
     {
         
@@ -36,12 +71,13 @@ public class LoginManager : MonoBehaviour {
 
     public void FacebookLogin()
     {
-        FB.LogInWithPublishPermissions(null, delegate (ILoginResult result)
+        var perms = new List<string>() { "public_profile", "email", "user_friends" };
+        FB.LogInWithReadPermissions(perms, delegate (ILoginResult result)
         {            
             if (FB.IsLoggedIn)
             {
                 Debug.Log("Login success");
-                StartCoroutine(_ParseLoginWithFacebook(result));
+                StartCoroutine(_ParseLoginWithFacebook());
             }
             else
             {
@@ -50,13 +86,14 @@ public class LoginManager : MonoBehaviour {
         });       
     }
 
-    private IEnumerator _ParseLoginWithFacebook(ILoginResult info)
+    private IEnumerator _ParseLoginWithFacebook()
     {
         if (FB.IsLoggedIn)
         {
+            var aToken = AccessToken.CurrentAccessToken;
             // Logging in with Parse
-            var loginTask = ParseFacebookUtils.LogInAsync(info.AccessToken.UserId,
-                                                          info.AccessToken.TokenString,
+            var loginTask = ParseFacebookUtils.LogInAsync(aToken.UserId,
+                                                          aToken.TokenString,
                                                           System.DateTime.Now);
             while (!loginTask.IsCompleted) yield return null;
             // Login completed, check results
