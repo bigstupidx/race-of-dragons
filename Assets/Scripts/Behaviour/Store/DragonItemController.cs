@@ -163,7 +163,7 @@ public class DragonItemController : MonoBehaviour
 
         if (itemInfo.useGem)
         {
-            if (PlayerData.Current.gem > itemInfo.Price)
+            if (PlayerData.Current.gem >= itemInfo.Price)
             {
                 PlayerData.Current.gem -= itemInfo.Price;
                 GemController.Instance.SetGems(PlayerData.Current.gem);
@@ -179,7 +179,7 @@ public class DragonItemController : MonoBehaviour
         }
         else
         {
-            if (PlayerData.Current.gold > itemInfo.Price)
+            if (PlayerData.Current.gold >= itemInfo.Price)
             {
                 PlayerData.Current.gold -= itemInfo.Price;
                 CoinController.Instance.SetCoins(PlayerData.Current.gold);

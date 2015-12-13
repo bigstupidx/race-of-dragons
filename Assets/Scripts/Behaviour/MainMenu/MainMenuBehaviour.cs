@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Parse;
 
-public class MainMenuBehaviour : MonoBehaviour {
+public class MainMenuBehaviour : MonoBehaviour
+{
 
     public GameObject optionDialog;
     public GameObject friendDialogPrefab;
+    public GameObject loginDialogPrefab;
 
     private FriendDialogController friendDialog;
 
@@ -16,7 +19,7 @@ public class MainMenuBehaviour : MonoBehaviour {
 
     public void OnStoreClick()
     {
-        Application.LoadLevel("Scene_Store");        
+        Application.LoadLevel("Scene_Store");
     }
 
     public void OnFriendsClick()
@@ -39,17 +42,24 @@ public class MainMenuBehaviour : MonoBehaviour {
     }
     #endregion
 
-    #region Mono Behaviour
-    // Use this for initialization
+    #region Mono Behaviour    
     void Start()
+    {
+        if (ParseUser.CurrentUser == null)
+        {
+            Instantiate(loginDialogPrefab);
+        }
+        else
+        {
+            PlayerData.Current.SaveOnServer();
+        }
+    }
+
+    void Update()
     {
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
 
-    } 
     #endregion
 }

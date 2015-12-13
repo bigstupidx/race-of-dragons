@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Facebook;
+using Facebook.Unity;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using Facebook.MiniJSON;
@@ -17,9 +17,12 @@ public class LoginManager : MonoBehaviour {
     public GameObject loadingDialogPrefab;
 
     private LoadingDialogBehaviour loadingDialogBehaviour;
+    private Animator animator;
     
     void Awake()
     {
+        animator = GetComponent<Animator>();
+
         FB.Init(delegate ()
        {
            Debug.Log("Init done!");
@@ -28,32 +31,32 @@ public class LoginManager : MonoBehaviour {
     
     void Start()
     {
-        ParseUser.LogOutAsync();
+        
     }
 
     public void FacebookLogin()
     {
-        FB.Login("user_about_me,user_friends", delegate (FBResult result) 
-        {
+        FB.LogInWithPublishPermissions(null, delegate (ILoginResult result)
+        {            
             if (FB.IsLoggedIn)
             {
                 Debug.Log("Login success");
-                StartCoroutine(_ParseLoginWithFacebook());
+                StartCoroutine(_ParseLoginWithFacebook(result));
             }
             else
             {
                 Debug.Log("FBLoginCallback: User canceled login");
             }
-        });
+        });       
     }
 
-    private IEnumerator _ParseLoginWithFacebook()
+    private IEnumerator _ParseLoginWithFacebook(ILoginResult info)
     {
         if (FB.IsLoggedIn)
         {
             // Logging in with Parse
-            var loginTask = ParseFacebookUtils.LogInAsync(FB.UserId,
-                                                          FB.AccessToken,
+            var loginTask = ParseFacebookUtils.LogInAsync(info.AccessToken.UserId,
+                                                          info.AccessToken.TokenString,
                                                           System.DateTime.Now);
             while (!loginTask.IsCompleted) yield return null;
             // Login completed, check results
@@ -71,9 +74,9 @@ public class LoginManager : MonoBehaviour {
             {
                 // Log in to Parse successful
                 // Get user info
-                FB.API("/me", HttpMethod.GET, delegate (FBResult result)
+                FB.API("/me", HttpMethod.GET, delegate (IGraphResult result)
                 {
-                    var resultObject = Json.Deserialize(result.Text) as Dictionary<string, object>;
+                    var resultObject = result.ResultDictionary;
                     var userProfile = new Dictionary<string, string>();
 
                     userProfile["facebookId"] = getDataValueForKey(resultObject, "id");
@@ -81,7 +84,7 @@ public class LoginManager : MonoBehaviour {
                     if (userProfile["facebookId"] != "")
                     {
                         userProfile["pictureURL"] = "https://graph.facebook.com/" + userProfile["facebookId"] + "/picture?type=large&return_ssl_resources=1";
-                    }                  
+                    }
 
                     StartCoroutine(_SaveUserProfile(userProfile));
                 });
@@ -92,7 +95,7 @@ public class LoginManager : MonoBehaviour {
 
     private IEnumerator _UpdateProfilePictureTexture(string pictureURL)
     {
-        string url = pictureURL + "&access_token=" + FB.AccessToken; ;
+        string url = pictureURL + "&access_token=";// + FB.AccessToken;
         WWW www = new WWW(url);
         yield return www;
         //avatar.texture = www.texture;
@@ -112,7 +115,7 @@ public class LoginManager : MonoBehaviour {
     }
 
 
-    private string getDataValueForKey(Dictionary<string, object> dict, string key)
+    private string getDataValueForKey(IDictionary<string, object> dict, string key)
     {
         object objectForKey;
         if (dict.TryGetValue(key, out objectForKey))
@@ -134,6 +137,7 @@ public class LoginManager : MonoBehaviour {
         listToDo.Add("Checking server...", _ConfirmLogin());
         listToDo.Add("Sync data ...", _SyncData());
         listToDo.Add("Get friends list ...", _GetFriendList());
+        listToDo.Add("Done!...", _PrepareSomeThing());
 
         loadingDialogBehaviour.SetUpToDoList(listToDo);
     }
@@ -212,6 +216,13 @@ public class LoginManager : MonoBehaviour {
                 PlayerData.Current.Save();
             }
         }
+    }
+
+    private IEnumerator _PrepareSomeThing()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        animator.SetBool("isDisappear", true);
     }
 
     public void ShowSignUpScreen()

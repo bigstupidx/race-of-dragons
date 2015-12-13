@@ -50,11 +50,13 @@ public class ChatEmojiController : MonoBehaviour
 
     [Header("Object")]
     public Text textChat;
+    public Text price;
 
 	void Start ()
     {
         chatItem.Load();
         textChat.text = chatItem.Text;
+        price.text = chatItem.Price + "";
 	}
 		
 	void Update ()
@@ -78,7 +80,7 @@ public class ChatEmojiController : MonoBehaviour
         while (!keyboard.done)
             yield return null;
 
-        if (PlayerData.Current.gold > chatItem.Price)
+        if (PlayerData.Current.gold >= chatItem.Price)
         {
             CoinController.Instance.SetCoins(PlayerData.Current.gold - chatItem.Price);
             chatItem.Text = keyboard.text;

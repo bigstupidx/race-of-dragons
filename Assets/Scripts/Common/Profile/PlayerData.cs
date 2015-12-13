@@ -70,8 +70,8 @@ public class PlayerData
     {        
         level = 1;
         exp = 0;
-        gold = 1000;
-        gem = 1;
+        gold = 0;
+        gem = 0;
         elo = 0;
         played = 0;
         win = 0;
@@ -144,6 +144,20 @@ public class PlayerData
     public void Save()
     {
         Save(current);
+    }
+
+    public void SaveOnServer()
+    {
+        var param = new Dictionary<string, object>();
+        param.Add("data", PlayerData.Current.ToDictionary());
+
+        var taskSync = ParseCloud.CallFunctionAsync<ParseObject>("saveUserData", param).ContinueWith(t2 =>
+        {
+            if (t2.IsCompleted)
+            {
+                Debug.Log("Save user data to server done!");
+            }
+        });
     }
 
     public void Load()
@@ -251,6 +265,6 @@ public class PlayerData
             friendList.Add(item.ToString());
         }
 
-        Save();
+        //Save();
     }
 }

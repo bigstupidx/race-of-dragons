@@ -26,6 +26,7 @@ public class ItemPropertie
     public ItemPropertie(Item item)
     {
         this.item = item;
+        level = 1;
     }
 
     public ItemPropertie(IDictionary<string, object> data)
@@ -38,7 +39,7 @@ public class ItemPropertie
     {
         Dictionary<string, object> result = new Dictionary<string, object>();
         result.Add("level", level);
-        result.Add("element", (int)item);
+        result.Add("item", (int)item);
 
         return result;
     }

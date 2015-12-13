@@ -6,7 +6,7 @@ public class InitInstanceBehaviour : MonoBehaviour
     
     void Awake()
     {
-        //DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(this.gameObject);
     }
 
 	// Use this for initialization
@@ -14,7 +14,7 @@ public class InitInstanceBehaviour : MonoBehaviour
     {
         PlayerData.Current.Load();
 
-        //SceneManager.Instance.LoadScene(E_SCENE.Scene_MainMenu, null);
+        SceneManager.Instance.LoadScene(E_SCENE.Scene_MainMenu, null);
 	}
-	
+
 }
