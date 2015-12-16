@@ -14,4 +14,11 @@ public static class ExtensionMethods
     {
         return new Vector3(vector2.x, vector2.y, 0);
     }
+
+    public static string ToShortString(this string str, int num = 8)
+    {
+        if (str.Length > 10)
+            return str.Substring(0, 8) + "...";        
+        return str;
+    }
 }

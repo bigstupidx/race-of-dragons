@@ -29,6 +29,12 @@ public class ItemPropertie
         level = 1;
     }
 
+    public float GetDuration()
+    {
+        level = PlayerData.Current.items[item.ToString()].level;
+        return GameModel.Instance.itemLevelConfig[item][level];
+    }
+
     public ItemPropertie(IDictionary<string, object> data)
     {
         level = int.Parse(data["level"].ToString());        

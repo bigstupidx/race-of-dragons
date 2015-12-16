@@ -10,7 +10,7 @@ public class ShieldController : Photon.PunBehaviour
 
     void Start()
     {
-
+        timeExist = PlayerData.Current.items[Item.Shield.ToString()].GetDuration();
     }
 
     void Update()

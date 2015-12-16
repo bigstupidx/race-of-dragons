@@ -10,9 +10,9 @@ public class SelectModeBehaviour : MonoBehaviour
         Application.LoadLevel("Scene_MainMenu");
     }
 
-    public void OnTrainingClick()
+    public void OnPracticeModeClick()
     {
-
+        Application.LoadLevel("Scene_Wating_Practice");
     }
 
     public void OnQuickRaceClick()

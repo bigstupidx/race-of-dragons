@@ -23,46 +23,18 @@ public class LoginManager : MonoBehaviour {
     {
         animator = GetComponent<Animator>();
 
-        if (!FB.IsInitialized)
-        {
-            // Initialize the Facebook SDK
-            FB.Init(InitCallback, OnHideUnity);
-        }
-        else
-        {
-            // Already initialized, signal an app activation App Event
-            FB.ActivateApp();
-        }
-    }
-
-    private void InitCallback()
-    {
         if (FB.IsInitialized)
         {
-            // Signal an app activation App Event
             FB.ActivateApp();
-            // Continue with Facebook SDK
-            // ...
         }
         else
         {
-            Debug.Log("Failed to Initialize the Facebook SDK");
+            //Handle FB.Init
+            FB.Init(() => {
+                FB.ActivateApp();
+            });
         }
-    }
-
-    private void OnHideUnity(bool isGameShown)
-    {
-        if (!isGameShown)
-        {
-            // Pause the game - we will need to hide
-            Time.timeScale = 0;
-        }
-        else
-        {
-            // Resume the game - we're getting focus again
-            Time.timeScale = 1;
-        }
-    }
+    }    
 
     void Start()
     {
@@ -116,12 +88,10 @@ public class LoginManager : MonoBehaviour {
                     var resultObject = result.ResultDictionary;
                     var userProfile = new Dictionary<string, string>();
 
-                    userProfile["facebookId"] = getDataValueForKey(resultObject, "id");
-                    userProfile["name"] = getDataValueForKey(resultObject, "name");
-                    if (userProfile["facebookId"] != "")
-                    {
-                        userProfile["pictureURL"] = "https://graph.facebook.com/" + userProfile["facebookId"] + "/picture?type=large&return_ssl_resources=1";
-                    }
+                    userProfile["facebookId"] = resultObject["id"].ToString();
+                    userProfile["name"] = resultObject["name"].ToString();                    
+                    userProfile["avatarUrl"] = "https://graph.facebook.com/" + userProfile["facebookId"] + "/picture?type=large&return_ssl_resources=1";
+                    
 
                     StartCoroutine(_SaveUserProfile(userProfile));
                 });
@@ -130,25 +100,32 @@ public class LoginManager : MonoBehaviour {
         }
     }
 
-    private IEnumerator _UpdateProfilePictureTexture(string pictureURL)
-    {
-        string url = pictureURL + "&access_token=";// + FB.AccessToken;
-        WWW www = new WWW(url);
-        yield return www;
-        //avatar.texture = www.texture;
-    }
-
     private IEnumerator _SaveUserProfile(Dictionary<string, string> profile)
     {
-        var user = ParseUser.CurrentUser;
-        user["profile"] = profile;
-        // Save if there have been any updates
-        if (user.IsKeyDirty("profile"))
+        var param = new Dictionary<string, object>();
+        param.Add("data", profile);
+
+        PlayerData.Current.name = profile["name"];
+
+        var taskSync = ParseCloud.CallFunctionAsync<ParseObject>("updateData", param).ContinueWith(t2 =>
         {
-            var saveTask = user.SaveAsync();
-            while (!saveTask.IsCompleted) yield return null;            
-        }
-        Debug.Log("Login was successful.");
+            
+        });
+
+        while (!taskSync.IsCompleted) yield return null;
+
+        Debug.Log("Update data was successful.");
+
+
+        GameObject loadingDialog = Instantiate(loadingDialogPrefab) as GameObject;
+        loadingDialogBehaviour = loadingDialog.GetComponent<LoadingDialogBehaviour>();
+        Dictionary<string, IEnumerator> listToDo = new Dictionary<string, IEnumerator>();
+        
+        listToDo.Add("Sync data ...", _SyncData());
+        listToDo.Add("Get friends list ...", _GetFriendList());
+        listToDo.Add("Done!...", _PrepareSomeThing());
+
+        loadingDialogBehaviour.SetUpToDoList(listToDo);
     }
 
 
@@ -166,8 +143,7 @@ public class LoginManager : MonoBehaviour {
     }
 
     public void ParseLogin()
-    {        
-
+    {
         GameObject loadingDialog = Instantiate(loadingDialogPrefab) as GameObject;
         loadingDialogBehaviour = loadingDialog.GetComponent<LoadingDialogBehaviour>();
         Dictionary<string, IEnumerator> listToDo = new Dictionary<string, IEnumerator>();
@@ -209,7 +185,8 @@ public class LoginManager : MonoBehaviour {
         if (ParseUser.CurrentUser != null)
         {
             PlayerData.Current.id = ParseUser.CurrentUser.ObjectId;
-            PlayerData.Current.name = ParseUser.CurrentUser.Username;
+            if (string.IsNullOrEmpty(PlayerData.Current.name))
+                PlayerData.Current.name = ParseUser.CurrentUser.Username;
             PlayerData.Current.Save();
 
             var param = new Dictionary<string, object>();

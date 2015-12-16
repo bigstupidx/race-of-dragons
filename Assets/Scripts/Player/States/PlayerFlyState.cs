@@ -26,6 +26,7 @@ public class PlayerFlyState : IState<PlayerController>
 
     public override void Begin()
     {
+        context.textName.text = "";
         context.playerState = PlayerState.Flying;
         body = context.body;
         body.gravityScale = 0;

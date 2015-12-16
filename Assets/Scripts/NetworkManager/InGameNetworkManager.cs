@@ -29,11 +29,14 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         smoothCamera.target = player;
 
         playerController = player.GetComponent<PlayerController>();
+
+        playerController.Name = PlayerData.Current.name;
+        playerController.textName.text = playerController.Name;
         //playerController.controlable = true;
 
         skillHolder.sprite = playerController.imageOfSkill;
         skillController.player = playerController;        
-        skillController.timeCoolDown = playerController.dragonPropertie.timeCooldown;
+        skillController.timeCoolDown = playerController.dragonPropertie.TimeCooldown;
         playerController.skillController = skillController;
 
         itemController.player = playerController;

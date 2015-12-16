@@ -38,23 +38,8 @@ public class RandomMatchMaker : Photon.MonoBehaviour
         }
     }
 
-    private void AlignListCardHolder()
-    {
-        float pos_Y = GameConsts.Instance.SCREEN_DESIGN_DEFAULT_HEIGHT * 0.1f * 0.01f;
-        float offset_X = GameConsts.Instance.SCREEN_DESIGN_DEFAULT_WIDTH * 0.25f * 0.01f;
-        float pos_X = 0;
-        float firstPosX = -GameConsts.Instance.SCREEN_DESIGN_DEFAULT_WIDTH * 0.5f * 0.01f + offset_X * 0.5f;
-
-        for (int i = 0; i < cardHolders.Length; i++)
-        {
-            pos_X = firstPosX + offset_X * i;
-            cardHolders[i].transform.position = new Vector3(pos_X, pos_Y, cardHolders[i].transform.position.z);
-        }
-    }
-
     public void Awake()
-    {
-        AlignListCardHolder();
+    {        
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
         PhotonNetwork.automaticallySyncScene = true;
 
@@ -69,7 +54,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
         // generate a name for this player, if none is assigned yet
         if (String.IsNullOrEmpty(PhotonNetwork.playerName))
         {
-            PhotonNetwork.playerName = "Guest" + Random.Range(1, 9999);            
+            PhotonNetwork.playerName = PlayerData.Current.name;            
         }
 
         // if you wanted more debug out, turn this on:
@@ -105,24 +90,23 @@ public class RandomMatchMaker : Photon.MonoBehaviour
         string dragonType = PlayerData.Current.CurrentDragon.element.ToString();        
 
         string dragonPrefab = dragonType + "Dragon";
-        GameObject player = PhotonNetwork.Instantiate(dragonPrefab, cardHolders[PhotonNetwork.playerList.Length - 1].position, Quaternion.identity, 0);          
+        GameObject player = PhotonNetwork.Instantiate(dragonPrefab, cardHolders[PhotonNetwork.playerList.Length - 1].position, Quaternion.identity, 0);
+        player.GetComponent<PlayerController>().Name = PlayerData.Current.name;
 
-        for (int i = 0; i < PhotonNetwork.playerList.Length; i++)
-        {
-            PhotonView playerPhotonView = PhotonView.Find(PhotonNetwork.playerList[i].ID);
-            if (playerPhotonView != null)
-                playerPhotonView.transform.position = cardHolders[i].position;
-        }
+        player.transform.parent = cardHolders[PhotonNetwork.playerList.Length - 1];
+        player.transform.localPosition = Vector3.zero;       
     }
 
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
-        Debug.Log("AAAA");
+        Debug.Log("OnPhotonInstantiate: " + info.sender);       
     }
 
     public void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
     {
-        PhotonView.Find(newPlayer.ID).transform.position = cardHolders[PhotonNetwork.playerList.Length - 1].position;
+        Debug.Log("OnPhotonPlayerConnected: " + newPlayer.ID);
+        GameObject[] listPlayer = GameObject.FindGameObjectsWithTag("Player");
+        Debug.Log(listPlayer.Length);        
     }
 
     public void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer)
@@ -169,10 +153,10 @@ public class RandomMatchMaker : Photon.MonoBehaviour
     {
         if (joined)
         {
-            if (PhotonNetwork.playerList.Length >= PhotonNetwork.room.maxPlayers)
+            if (PhotonNetwork.playerList.Length >= 2)
             {
                 timeCountDown += Time.deltaTime;
-                textCountDown.text = (int)(GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY + 1 - timeCountDown) + "";
+                textCountDown.text = "Game Starting in " + (int)(GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY + 1 - timeCountDown) + "";
 
                 if (timeCountDown >= GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY)
                 {

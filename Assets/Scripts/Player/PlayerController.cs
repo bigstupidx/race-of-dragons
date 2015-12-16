@@ -24,17 +24,32 @@ public enum PlayerState
 public class DragonPropertie
 {
     public int level = 1;     
-    public Element element;
-    public float timeCooldown = 30;  
+    public Element element;    
 
     public DragonPropertie()
     {
-        element = (Element)(UnityEngine.Random.Range(0, 3));
+        element = (Element)(UnityEngine.Random.Range(0, 3));        
     }
 
     public DragonPropertie(Element ele)
     {
-        element = ele;
+        element = ele;        
+    }
+
+    public void Load()
+    {
+        if (PlayerData.Current.dragons.ContainsKey(element.ToString()))
+        {
+            level = PlayerData.Current.dragons[element.ToString()].level;
+        }
+    }
+
+    public float TimeCooldown
+    {
+        get
+        {
+            return GameModel.Instance.dragonLevelConfig[element][level];
+        }
     }
 
     public DragonPropertie(IDictionary<string, object> data)
@@ -64,6 +79,7 @@ public class PlayerController : Photon.PunBehaviour
 
     [HideInInspector] public Animator animator;
     [HideInInspector] public Rigidbody2D body;
+    [HideInInspector] public TextMesh textName;
 
     public float speedAngle = GameConsts.Instance.PLAYER_SPEED_ANGLE_DEFAULT;
     public float maxSpeedAngle = 20;
@@ -110,15 +126,15 @@ public class PlayerController : Photon.PunBehaviour
         }
     }
 
-    public Vector3 PrevPos
+    public string Name
     {
         get
         {
-            return GameUtils.GetCustomProperty<Vector3>(photonView, "PREV_POS", Vector3.zero);
+            return GameUtils.GetCustomProperty<string>(photonView, "NAME", "");
         }
         set
         {
-            GameUtils.SetCustomProperty<Vector3>(photonView, "PREV_POS", value);
+            GameUtils.SetCustomProperty<string>(photonView, "NAME", value);
         }
     }
     #endregion
@@ -155,6 +171,8 @@ public class PlayerController : Photon.PunBehaviour
 
         body = GetComponent<Rigidbody2D>();
         animator = GetComponentInChildren<Animator>();
+        textName = GetComponentInChildren<TextMesh>();
+        dragonPropertie.Load();
     }
 
     void Start()
@@ -200,6 +218,11 @@ public class PlayerController : Photon.PunBehaviour
         if (transform.position.y < -10)
         {
             ResetPosition();
+        }
+
+        if (PhotonNetwork.offlineMode == true)
+        {
+            PosX = transform.position.x;
         }
     }
 
@@ -278,7 +301,8 @@ public class PlayerController : Photon.PunBehaviour
         {
             if (skillController != null)
             {
-                skillController.ReduceTimeCoolDown(5); // defaul is 5 sec
+                float duration = PlayerData.Current.items[currentItem.ToString()].GetDuration();
+                skillController.ReduceTimeCoolDown(duration); // defaul is 5 sec
             }
         }
 
