@@ -7,6 +7,8 @@ public class InitInstanceBehaviour : MonoBehaviour
     void Awake()
     {
         DontDestroyOnLoad(this.gameObject);
+
+        Application.targetFrameRate = 60;
     }
 
 	// Use this for initialization

@@ -42,6 +42,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
     {        
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
         PhotonNetwork.automaticallySyncScene = true;
+        PhotonNetwork.offlineMode = false;
 
         // the following line checks if this client was just created (and not yet online). if so, we connect
         if (PhotonNetwork.connectionStateDetailed == PeerState.PeerCreated)

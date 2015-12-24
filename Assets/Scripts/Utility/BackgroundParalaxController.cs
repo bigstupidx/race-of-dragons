@@ -6,8 +6,8 @@ public class BackgroundParalaxController : MonoBehaviour
     private Transform cam;
     private Vector3 previousCamPos;
 
-    private float parallaxScale = -10f;
-    private float smoothing = 2f;
+    private float parallaxScale = -18f;
+    private float smoothing = 1f;
     
     void Awake()
     {
