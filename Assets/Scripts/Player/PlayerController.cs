@@ -17,7 +17,8 @@ public enum PlayerState
     Running,
     Burning,
     Slowing,
-    FallInWater
+    FallInWater,
+    FinishRaceState
 }
 
 [Serializable]
@@ -94,9 +95,11 @@ public class PlayerController : Photon.PunBehaviour
     [HideInInspector] public bool hasShield;
     [HideInInspector] public PlayerState playerState;
     [HideInInspector] public Vector3 safePos;
+    [HideInInspector] public Vector3 victoryPos = Vector3.zero;
 
     private bool isSlow;
     private float timer;
+    [HideInInspector] public bool isFinish;
 
     #region Get & Set
 
@@ -125,6 +128,8 @@ public class PlayerController : Photon.PunBehaviour
             GameUtils.SetCustomProperty<float>(photonView, "POS_X", value);
         }
     }
+
+    public int Result { get; set; }
 
     public string Name
     {
@@ -161,6 +166,7 @@ public class PlayerController : Photon.PunBehaviour
         stateMachine.AddState(new PlayerBurningState());
         stateMachine.AddState(new PlayerThunderBoostState());
         stateMachine.AddState(new PlayerFallInWaterState());
+        stateMachine.AddState(new PlayerFinishRaceState());
 
         stateMachine.ChangeState<PlayerWaitingState>();
         // listen for state changes
@@ -184,6 +190,29 @@ public class PlayerController : Photon.PunBehaviour
     {
         if (!controlable)
             return;
+
+        // check victory
+        if (victoryPos != Vector3.zero)
+        {
+            if (transform.position.x > victoryPos.x && isFinish == false)
+            {
+                isFinish = true;
+                List<Dictionary<int, string>> result = GameUtils.GetRoomCustomProperty<List<Dictionary<int, string>>>("RESULT", null);
+
+                if (result == null)
+                    result = new List<Dictionary<int, string>>();
+
+                GameTimeController.Instance.isStart = false;
+                string timeFinish = GameTimeController.Instance.text.text;
+                var dict = new Dictionary<int, string>();
+                dict.Add(photonView.ownerId, timeFinish);
+                result.Add(dict);
+                Result = result.Count + 1;
+                GameUtils.SetRoomCustomProperty<List<Dictionary<int, string>>>("RESULT", result);
+                
+                stateMachine.ChangeState<PlayerFinishRaceState>();
+            }
+        }
 
         if (isSlow)
             Time.timeScale = 0.5f;

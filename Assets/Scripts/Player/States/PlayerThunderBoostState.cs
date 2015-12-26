@@ -7,7 +7,7 @@ public class PlayerThunderBoostState : IState<PlayerController>
     private Rigidbody2D body;
     private Vector2 vel;
     private float timer;
-    private float maxForce = 50;
+    private float maxForce = 30;
     public PlayerThunderBoostState() : base ()
     {
 

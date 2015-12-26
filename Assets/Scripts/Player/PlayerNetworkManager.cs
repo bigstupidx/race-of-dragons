@@ -29,7 +29,6 @@ public class PlayerNetworkManager : Photon.MonoBehaviour
             //We own this player: send the others our data            
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
-
             playerController.PosX = transform.position.x;
         }
         else

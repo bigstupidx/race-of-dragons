@@ -2,10 +2,11 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class GameTimeController : MonoBehaviour
+public class GameTimeController : Singleton<GameTimeController>
 {
     public Text text;    
     [HideInInspector] public bool isStart;
+    [HideInInspector] public PlayerController playerController;
 
     private double currentTime;
     private float timer;

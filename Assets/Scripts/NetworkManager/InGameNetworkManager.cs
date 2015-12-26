@@ -9,9 +9,18 @@ public class InGameNetworkManager : Photon.MonoBehaviour
     public Image itemHolder;
     public SkillController skillController;
     public ItemController itemController;
-    public GameObject timeCountDown;
     
     [HideInInspector] public PlayerController playerController;
+
+    GameObject[] listPlayer;
+    bool hasChampion;
+    float timeToChangeScene = 30;
+    float timer;
+
+    void Awake()
+    {
+        PhotonNetwork.automaticallySyncScene = true;
+    }
 
     void Start()
     {
@@ -44,21 +53,53 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         GameObject avatar = PhotonNetwork.Instantiate("Avatar" + dragonType, Vector3.zero, Quaternion.identity, 0);
         AvatarController avatarController = avatar.GetComponent<AvatarController>();
         avatarController.SetPlayer(playerController);
+
+        GameObject victory = GameObject.FindGameObjectWithTag("Victory") as GameObject;
+        playerController.victoryPos = victory.transform.position;
     }
 
     void Update()
     {
-        position.text = GetPositionOfCurrentPlayer();
+        if (listPlayer == null)
+        {
+            listPlayer = GameObject.FindGameObjectsWithTag("Player");
+        }
+        else
+        {
+            if (listPlayer.Length < PhotonNetwork.room.playerCount)
+            {
+                listPlayer = GameObject.FindGameObjectsWithTag("Player");
+            }
+            else
+            {
+                position.text = GetPositionOfCurrentPlayer();
+            }
+        }    
+        
+        if (hasChampion)
+        {
+            timeToChangeScene -= Time.deltaTime;
+            if (timeToChangeScene <= 0)
+            {
+                timeToChangeScene = 20;
+                if (PhotonNetwork.isMasterClient)
+                {
+                    PhotonNetwork.LoadLevel("Scene_GameResult");
+                }
+            }
+        }    
     }
 
     string GetPositionOfCurrentPlayer()
-    {
-        GameObject[] listPlayer = GameObject.FindGameObjectsWithTag("Player");
+    {        
         List<float> listPosX = new List<float>();
         for (int i = 0; i < listPlayer.Length; i++)
         {
             var player = listPlayer[i].GetComponent<PlayerController>();
             listPosX.Add(player.PosX);
+
+            if (player.isFinish)
+                hasChampion = true;
         }
         listPosX.Sort();
 
@@ -79,7 +120,7 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 
     public void OnGUI()
     {
-        GUILayout.Label(PhotonNetwork.GetPing() + "");
+        //GUILayout.Label(PhotonNetwork.GetPing() + "");
     }
 
     public void OnMasterClientSwitched(PhotonPlayer player)
@@ -129,12 +170,13 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 
     public void OnPhotonPlayerConnected(PhotonPlayer player)
     {
-        Debug.Log("OnPhotonPlayerConnected: " + player);
+        Debug.Log("OnPhotonPlayerConnected: " + player);        
     }
 
     public void OnPhotonPlayerDisconnected(PhotonPlayer player)
     {
         Debug.Log("OnPlayerDisconneced: " + player);
+        
     }
 
     public void OnFailedToConnectToPhoton()

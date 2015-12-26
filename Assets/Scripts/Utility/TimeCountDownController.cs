@@ -36,7 +36,7 @@ public class TimeCountDownController : MonoBehaviour
             text.text = "";
             gameObject.SetActive(false);
             gameController.playerController.controlable = true;
-            gameTime.SetTimeStart();
+            gameTime.SetTimeStart();           
         }       
 	}
 }

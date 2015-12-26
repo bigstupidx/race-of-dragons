@@ -62,22 +62,22 @@ public class RandomMatchMaker : Photon.MonoBehaviour
         PhotonNetwork.logLevel = PhotonLogLevel.ErrorsOnly;
     }
 
-    public void OnGUI()
-    {
-        GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
+    //public void OnGUI()
+    //{
+    //    GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
 
-        if (!string.IsNullOrEmpty(ErrorDialog))
-        {
-            GUILayout.Label(ErrorDialog);
+    //    if (!string.IsNullOrEmpty(ErrorDialog))
+    //    {
+    //        GUILayout.Label(ErrorDialog);
 
-            if (this.timeToClearDialog < Time.time)
-            {
-                this.timeToClearDialog = 0;
-                ErrorDialog = "";
-            }
-        }
+    //        if (this.timeToClearDialog < Time.time)
+    //        {
+    //            this.timeToClearDialog = 0;
+    //            ErrorDialog = "";
+    //        }
+    //    }
 
-    }
+    //}
 
     public void OnJoinedLobby()
     {
