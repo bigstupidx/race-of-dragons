@@ -26,8 +26,7 @@ public class PlayerNetworkManager : Photon.MonoBehaviour
     {
         if (stream.isWriting)
         {
-            //We own this player: send the others our data
-            //stream.SendNext((int)controllerScript._characterState);
+            //We own this player: send the others our data            
             stream.SendNext(transform.position);
             stream.SendNext(transform.rotation);
 
@@ -35,8 +34,7 @@ public class PlayerNetworkManager : Photon.MonoBehaviour
         }
         else
         {
-            //Network player, receive data
-            //controllerScript._characterState = (CharacterState)(int)stream.ReceiveNext();
+            //Network player, receive data            
             correctPlayerPos = (Vector3)stream.ReceiveNext();
             correctPlayerRot = (Quaternion)stream.ReceiveNext();
         }
