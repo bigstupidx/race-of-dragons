@@ -129,7 +129,29 @@ public class PlayerController : Photon.PunBehaviour
         }
     }
 
-    public int Result { get; set; }
+    public float Result
+    {
+        get
+        {
+            return GameUtils.GetCustomProperty<float>(photonView, "RESULT", 0f);
+        }
+        set
+        {
+            GameUtils.SetCustomProperty<float>(photonView, "RESULT", value);
+        }
+    }
+
+    public int EndPosition
+    {
+        get
+        {
+            return GameUtils.GetCustomProperty<int>(photonView, "POSITION", 0);
+        }
+        set
+        {
+            GameUtils.SetCustomProperty<int>(photonView, "POSITION", value);
+        }
+    }
 
     public string Name
     {
@@ -196,19 +218,16 @@ public class PlayerController : Photon.PunBehaviour
         {
             if (transform.position.x > victoryPos.x && isFinish == false)
             {
-                isFinish = true;
-                List<Dictionary<int, string>> result = GameUtils.GetRoomCustomProperty<List<Dictionary<int, string>>>("RESULT", null);
-
-                if (result == null)
-                    result = new List<Dictionary<int, string>>();
+                isFinish = true;                
 
                 GameTimeController.Instance.isStart = false;
                 string timeFinish = GameTimeController.Instance.text.text;
-                var dict = new Dictionary<int, string>();
-                dict.Add(photonView.ownerId, timeFinish);
-                result.Add(dict);
-                Result = result.Count + 1;
-                GameUtils.SetRoomCustomProperty<List<Dictionary<int, string>>>("RESULT", result);
+                Result = float.Parse(timeFinish);
+
+                int playerFinished = GameUtils.GetRoomCustomProperty<int>("FINISHED", 0);
+                playerFinished += 1;
+                GameUtils.SetRoomCustomProperty<int>("FINISHED", playerFinished);
+                EndPosition = playerFinished;
                 
                 stateMachine.ChangeState<PlayerFinishRaceState>();
             }
@@ -249,7 +268,7 @@ public class PlayerController : Photon.PunBehaviour
             ResetPosition();
         }
 
-        if (PhotonNetwork.offlineMode == true)
+        if (PhotonNetwork.offlineMode == true || PhotonNetwork.room.playerCount <= 1)
         {
             PosX = transform.position.x;
         }

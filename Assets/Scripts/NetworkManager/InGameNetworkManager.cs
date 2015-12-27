@@ -66,14 +66,17 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         }
         else
         {
-            if (listPlayer.Length < PhotonNetwork.room.playerCount)
+            if (PhotonNetwork.room != null)
             {
-                listPlayer = GameObject.FindGameObjectsWithTag("Player");
-            }
-            else
-            {
-                position.text = GetPositionOfCurrentPlayer();
-            }
+                if (listPlayer.Length < PhotonNetwork.room.playerCount)
+                {
+                    listPlayer = GameObject.FindGameObjectsWithTag("Player");
+                }
+                else
+                {
+                    position.text = GetPositionOfCurrentPlayer();
+                }
+            }            
         }    
         
         if (hasChampion)
@@ -185,5 +188,10 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 
         // back to main menu        
         //Application.LoadLevel(WaitingMenu.SceneNameMenu);
+    }
+
+    public void OnQuitMatch()
+    {
+        ConfirmQuitMatchDialogBehaviour.Instance.Show();
     }
 }

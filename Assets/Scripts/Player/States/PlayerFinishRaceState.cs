@@ -20,7 +20,7 @@ public class PlayerFinishRaceState : IState<PlayerController>
         body.velocity = Vector2.zero;
         body.gravityScale = 0;
 
-        Vector3 newPos = context.victoryPos + (4 - context.Result + 1) * Vector3.right * 3;
+        Vector3 newPos = context.victoryPos + (4 - context.EndPosition + 1) * Vector3.right * 3;
         context.transform.ZKpositionTo(newPos, 1.5f).start();
     }
 

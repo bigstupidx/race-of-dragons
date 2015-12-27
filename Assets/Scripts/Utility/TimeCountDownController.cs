@@ -9,6 +9,7 @@ public class TimeCountDownController : MonoBehaviour
     public GameTimeController gameTime;
     private float timer;
     private double startTime;
+    private bool isStartCountDown;
 
 	// Use this for initialization
 	void Start ()
@@ -20,23 +21,35 @@ public class TimeCountDownController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        timer = (float)(PhotonNetwork.time - startTime);
-        if (timer > 1)
+        if (!isStartCountDown)
         {
-            text.text = (int)(5 - timer) + "";
+            var listPlayer = GameObject.FindGameObjectsWithTag("Player");
+            if (listPlayer.Length >= PhotonNetwork.room.playerCount)
+            {
+                isStartCountDown = true;
+                startTime = PhotonNetwork.time;
+            }
         }
-
-        if (timer > 4)
+        else
         {
-            text.text = "Go";
-        }
+            timer = (float)(PhotonNetwork.time - startTime);
+            if (timer > 1)
+            {
+                text.text = (int)(5 - timer) + "";
+            }
 
-        if (timer > 4.5f)
-        {
-            text.text = "";
-            gameObject.SetActive(false);
-            gameController.playerController.controlable = true;
-            gameTime.SetTimeStart();           
-        }       
+            if (timer > 4)
+            {
+                text.text = "Go";
+            }
+
+            if (timer > 4.5f)
+            {
+                text.text = "";
+                gameObject.SetActive(false);
+                gameController.playerController.controlable = true;
+                gameTime.SetTimeStart();
+            }
+        }        
 	}
 }
