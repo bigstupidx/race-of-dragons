@@ -28,6 +28,7 @@ public class GameModel
     public Dictionary<Element, Dictionary<int, float>> dragonLevelConfig;
     public Dictionary<Item, Dictionary<int, float>> itemLevelConfig;
     public Dictionary<Emoji, string> chatConfig;
+    public Dictionary<int, int> expLevelUpConfig;
 
     public void Load()
     {
@@ -36,6 +37,7 @@ public class GameModel
         LoadDragonLevelConfig();
         LoadItemLevelConfig();
         LoadChatConfig();
+        LoadExpLevelUpConfig();
     }
 
     private void LoadChatConfig()
@@ -162,6 +164,27 @@ public class GameModel
             itemLevelConfig[Item.SpeedUp].Add(i, float.Parse(strarr[2]));
             itemLevelConfig[Item.Energy].Add(i, float.Parse(strarr[3]));
             itemLevelConfig[Item.Rocket].Add(i, float.Parse(strarr[4]));
+        }
+    }
+
+    public void LoadExpLevelUpConfig()
+    {
+        TextAsset assetpoint = Resources.Load("Data/exp_level_config") as TextAsset;
+
+        string[] data = assetpoint.text.Split('\n');
+        string[] strarr;
+
+        expLevelUpConfig = new Dictionary<int, int>();
+
+        for (int i = 1; i < data.Length; i++)
+        {
+            if (data[i] == "") break;
+
+            strarr = data[i].Split(',');
+            int level = int.Parse(strarr[0]);
+            int exp = int.Parse(strarr[1]);
+
+            expLevelUpConfig.Add(level, exp);            
         }
     }
 

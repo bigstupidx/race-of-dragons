@@ -92,7 +92,10 @@ public class RandomMatchMaker : Photon.MonoBehaviour
 
         string dragonPrefab = dragonType + "Dragon";
         GameObject player = PhotonNetwork.Instantiate(dragonPrefab, cardHolders[PhotonNetwork.playerList.Length - 1].position, Quaternion.identity, 0);
-        player.GetComponent<PlayerController>().Name = PlayerData.Current.name;
+        var playerController = player.GetComponent<PlayerController>();
+        playerController.Name = PlayerData.Current.name;
+        playerController.ParseId = PlayerData.Current.id;
+        playerController.AvatarUrl = PlayerData.Current.avatarUrl;
 
         player.transform.parent = cardHolders[PhotonNetwork.playerList.Length - 1];
         player.transform.localPosition = Vector3.zero;       

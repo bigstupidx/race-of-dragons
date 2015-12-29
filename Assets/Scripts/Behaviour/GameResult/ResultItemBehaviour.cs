@@ -18,4 +18,9 @@ public class ResultItemBehaviour : MonoBehaviour
         this.textName.text = name;
         this.textTime.text = time;
     }	
+
+    public void LoadAvatar(string avatarUrl)
+    {
+        StartCoroutine(GameUtils.Instance._DownloadImage(avatarUrl, avatar));
+    }
 }

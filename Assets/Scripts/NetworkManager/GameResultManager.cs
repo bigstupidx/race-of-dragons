@@ -28,14 +28,31 @@ public class GameResultManager : Photon.MonoBehaviour
             int pos = (int)PhotonNetwork.playerList[i].customProperties["POSITION"] - 1;
             string name = (string)PhotonNetwork.playerList[i].customProperties["NAME"];
             float result = (float)PhotonNetwork.playerList[i].customProperties["RESULT"];
+            string avatarUrl = (string)PhotonNetwork.playerList[i].customProperties["AVATAR_URL"];
+            string parseId = (string)PhotonNetwork.playerList[i].customProperties["PARSE_ID"];
 
             listItemResult[pos].gameObject.SetActive(true);
             listItemResult[pos].SetText(name, result.ToString("0.0"));
+            listItemResult[pos].LoadAvatar(avatarUrl);
         }
+
+
     }
 		
 	void Update ()
     {
 	
 	}
+
+    public void OnHomeClick()
+    {
+        PhotonNetwork.LeaveRoom();
+        Application.LoadLevel("Scene_MainMenu");
+    }
+
+    public void OnReplayClick()
+    {
+        PhotonNetwork.LeaveRoom();
+        Application.LoadLevel("Scene_Select_Mode");
+    }
 }

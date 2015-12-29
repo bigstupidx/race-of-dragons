@@ -164,6 +164,30 @@ public class PlayerController : Photon.PunBehaviour
             GameUtils.SetCustomProperty<string>(photonView, "NAME", value);
         }
     }
+
+    public string AvatarUrl
+    {
+        get
+        {
+            return GameUtils.GetCustomProperty<string>(photonView, "AVATAR_URL", "");
+        }
+        set
+        {
+            GameUtils.SetCustomProperty<string>(photonView, "AVATAR_URL", value);
+        }
+    }
+
+    public string ParseId
+    {
+        get
+        {
+            return GameUtils.GetCustomProperty<string>(photonView, "PARSE_ID", "");
+        }
+        set
+        {
+            GameUtils.SetCustomProperty<string>(photonView, "PARSE_ID", value);
+        }
+    }
     #endregion
 
     private float CalculateAlpha(float x, float y)

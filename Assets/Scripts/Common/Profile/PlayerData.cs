@@ -36,6 +36,7 @@ public class PlayerData
 
     public string id;
     public string name;
+    public string avatarUrl;
 
     public int level;
     public int exp;
@@ -227,6 +228,7 @@ public class PlayerData
     public void SyncData(ParseObject data)
     {
         name = data.Get<string>("name");
+        avatarUrl = data.Get<string>("avatarUrl");
         level = data.Get<int>("level");
         exp = data.Get<int>("exp");
         gold = data.Get<int>("gold");

@@ -40,6 +40,9 @@ public class InGameNetworkManager : Photon.MonoBehaviour
         playerController = player.GetComponent<PlayerController>();
 
         playerController.Name = PlayerData.Current.name;
+        playerController.ParseId = PlayerData.Current.id;
+        playerController.AvatarUrl = PlayerData.Current.avatarUrl;
+
         playerController.textName.text = playerController.Name;
         //playerController.controlable = true;
 
