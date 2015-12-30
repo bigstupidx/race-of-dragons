@@ -22,7 +22,7 @@ public class SelectModeBehaviour : MonoBehaviour
 
     public void OnInviteFriendClick()
     {
-
+        Application.LoadLevel("Scene_Wating_Friend");
     } 
     #endregion
 

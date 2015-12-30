@@ -83,17 +83,21 @@ public class LoginManager : MonoBehaviour {
             {
                 // Log in to Parse successful
                 // Get user info
-                FB.API("/me", HttpMethod.GET, delegate (IGraphResult result)
+                FB.API("/me?fields=id,first_name", HttpMethod.GET, delegate (IGraphResult result)
                 {
                     var resultObject = result.ResultDictionary;
-                    var userProfile = new Dictionary<string, string>();
 
-                    userProfile["facebookId"] = resultObject["id"].ToString();
-                    userProfile["name"] = resultObject["name"].ToString();                    
-                    userProfile["avatarUrl"] = "https://graph.facebook.com/" + userProfile["facebookId"] + "/picture?type=large&return_ssl_resources=1";
-                    
+                    if (resultObject != null)
+                    {
+                        var userProfile = new Dictionary<string, string>();
 
-                    StartCoroutine(_SaveUserProfile(userProfile));
+                        userProfile["facebookId"] = resultObject["id"].ToString();
+                        userProfile["name"] = resultObject["first_name"].ToString();
+                        userProfile["avatarUrl"] = "https://graph.facebook.com/" + userProfile["facebookId"] + "/picture?type=large&return_ssl_resources=1";
+
+
+                        StartCoroutine(_SaveUserProfile(userProfile));
+                    }                   
                 });
 
             }
@@ -106,6 +110,8 @@ public class LoginManager : MonoBehaviour {
         param.Add("data", profile);
 
         PlayerData.Current.name = profile["name"];
+        PlayerData.Current.avatarUrl = profile["avatarUrl"];
+        PlayerData.Current.Save();
 
         var taskSync = ParseCloud.CallFunctionAsync<ParseObject>("updateData", param).ContinueWith(t2 =>
         {

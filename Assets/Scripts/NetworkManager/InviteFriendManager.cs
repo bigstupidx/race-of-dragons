@@ -1,49 +1,23 @@
-// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WorkerMenu.cs" company="Exit Games GmbH">
-//   Part of: Photon Unity Networking
-// </copyright>
-// --------------------------------------------------------------------------------------------------------------------
-
-using System;
+﻿using UnityEngine;
 using System.Collections;
-using UnityEngine;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
+using System;
 
-public class RandomMatchMaker : Photon.MonoBehaviour
-{        
+public class InviteFriendManager : Photon.MonoBehaviour
+{
+    public GameObject friendDialogPrefab;
     public Text textCountDown;
-    
+
     public Transform[] cardHolders;
-  
+
     private bool connectFailed = false;
     private bool joined = false;
-
-    public static readonly string SceneNameMenu = "Scene_Waiting";
-    public static readonly string SceneNameGame = "Scene_Game";
-
-    private string errorDialog;
-    private double timeToClearDialog;
     private float timeCountDown;
-
     private bool isStartGame;
-    private float timeStart;
-
-    public string ErrorDialog
-    {
-        get { return this.errorDialog; }
-        private set
-        {
-            this.errorDialog = value;
-            if (!string.IsNullOrEmpty(value))
-            {
-                this.timeToClearDialog = Time.time + 4.0f;
-            }
-        }
-    }
+    private float startTime;
 
     public void Awake()
-    {        
+    {
         // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
         PhotonNetwork.automaticallySyncScene = true;
         PhotonNetwork.offlineMode = false;
@@ -59,29 +33,12 @@ public class RandomMatchMaker : Photon.MonoBehaviour
         // generate a name for this player, if none is assigned yet
         if (String.IsNullOrEmpty(PhotonNetwork.playerName))
         {
-            PhotonNetwork.playerName = PlayerData.Current.name;            
+            PhotonNetwork.playerName = PlayerData.Current.name;
         }
 
         // if you wanted more debug out, turn this on:
         PhotonNetwork.logLevel = PhotonLogLevel.ErrorsOnly;
     }
-
-    //public void OnGUI()
-    //{
-    //    GUILayout.Label(PhotonNetwork.connectionStateDetailed.ToString());
-
-    //    if (!string.IsNullOrEmpty(ErrorDialog))
-    //    {
-    //        GUILayout.Label(ErrorDialog);
-
-    //        if (this.timeToClearDialog < Time.time)
-    //        {
-    //            this.timeToClearDialog = 0;
-    //            ErrorDialog = "";
-    //        }
-    //    }
-
-    //}
 
     public void OnJoinedLobby()
     {
@@ -92,7 +49,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
     {
         Debug.Log("OnJoinedRoom");
         joined = true;
-        string dragonType = PlayerData.Current.CurrentDragon.element.ToString();        
+        string dragonType = PlayerData.Current.CurrentDragon.element.ToString();
 
         string dragonPrefab = dragonType + "Dragon";
         GameObject player = PhotonNetwork.Instantiate(dragonPrefab, cardHolders[PhotonNetwork.playerList.Length - 1].position, Quaternion.identity, 0);
@@ -102,19 +59,19 @@ public class RandomMatchMaker : Photon.MonoBehaviour
         playerController.AvatarUrl = PlayerData.Current.avatarUrl;
 
         player.transform.parent = cardHolders[PhotonNetwork.playerList.Length - 1];
-        player.transform.localPosition = Vector3.zero;       
+        player.transform.localPosition = Vector3.zero;
     }
 
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
-        Debug.Log("OnPhotonInstantiate: " + info.sender);       
+        Debug.Log("OnPhotonInstantiate: " + info.sender);
     }
 
     public void OnPhotonPlayerConnected(PhotonPlayer newPlayer)
     {
         Debug.Log("OnPhotonPlayerConnected: " + newPlayer.ID);
         GameObject[] listPlayer = GameObject.FindGameObjectsWithTag("Player");
-        Debug.Log(listPlayer.Length);        
+        Debug.Log(listPlayer.Length);
     }
 
     public void OnPhotonPlayerDisconnected(PhotonPlayer otherPlayer)
@@ -122,8 +79,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
     }
 
     public void OnPhotonRandomJoinFailed()
-    {
-        ErrorDialog = "Error: Can't join random room (none found).";
+    {       
         Debug.Log("OnPhotonRandomJoinFailed got called. Happens if no room is available (or all full or invisible or closed). JoinrRandom filter-options can limit available rooms.");
         PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 3 }, TypedLobby.Default);
     }
@@ -135,7 +91,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
 
     public void OnDisconnectedFromPhoton()
     {
-        Debug.Log("Disconnected from Photon.");       
+        Debug.Log("Disconnected from Photon.");
     }
 
     public void OnFailedToConnectToPhoton(object parameters)
@@ -146,13 +102,13 @@ public class RandomMatchMaker : Photon.MonoBehaviour
 
     public void OnMasterClientSwitched(PhotonPlayer player)
     {
-        
+
     }
 
     public void OnLeftRoom()
     {
         Debug.Log("OnLeftRoom (local)");
-        
+
         // back to main menu        
         //Application.LoadLevel(WaitingMenu.SceneNameMenu);
     }
@@ -161,17 +117,15 @@ public class RandomMatchMaker : Photon.MonoBehaviour
     {
         if (joined)
         {
-            timeStart = GameUtils.GetRoomCustomProperty<float>("START_TIME", 0);
-            if (!isStartGame && PhotonNetwork.playerList.Length >= 2 && timeStart == 0)
+            startTime = (float)GameUtils.GetRoomCustomProperty<double>("START_TIME", 0);
+            if (startTime != 0)
             {
-                isStartGame = true;
-                timeStart = (float)PhotonNetwork.time;
-                GameUtils.SetRoomCustomProperty<float>("START_TIME", timeStart);
+                isStartGame = true;                
             }
 
-            if (PhotonNetwork.playerList.Length >= 2)
+            if (isStartGame)
             {
-                timeCountDown = (float)(PhotonNetwork.time - timeStart);
+                timeCountDown = (float)(PhotonNetwork.time - startTime);
                 textCountDown.text = "Game Starting in " + (int)(GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY + 1 - timeCountDown) + "";
 
                 if (timeCountDown >= GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY)
@@ -180,16 +134,37 @@ public class RandomMatchMaker : Photon.MonoBehaviour
 
                     if (PhotonNetwork.isMasterClient)
                     {
-                        int rand = Random.Range(0, 4);
+                        int rand = UnityEngine.Random.Range(0, 4);
                         GameUtils.SetRoomCustomProperty<int>("MAP_ID", rand);
                         PhotonNetwork.LoadLevel("Scene_Game");
                     }
-                        
-                    timeCountDown = GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY;                    
-                }                
+
+                    timeCountDown = GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY;
+                }
             }
         }
-        
+
+    }    
+
+    #region UI Delegate
+    public void OnBackClick()
+    {
+
     }
 
+    public void OnPlayClick()
+    {
+        if (PhotonNetwork.isMasterClient && isStartGame == false)
+        {
+            isStartGame = true;
+            startTime = (float)PhotonNetwork.time;
+            GameUtils.SetRoomCustomProperty<double>("START_TIME", PhotonNetwork.time);
+        }
+    }
+
+    public void OnInviteClick()
+    {
+        Instantiate(friendDialogPrefab);
+    }
+    #endregion
 }
