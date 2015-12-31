@@ -47,6 +47,48 @@
             An event that is raised whenever progress changes are reported.
             </summary>
         </member>
+        <member name="T:System.TypeExtensions">
+             <summary>
+             Unity does not have an API for GetTypeInfo(), instead they expose most of the methods
+             on System.Reflection.TypeInfo on the type itself. This poses a problem for compatibility
+             with the rest of the C# world, as we expect the result of GetTypeInfo() to be an actual TypeInfo,
+             as well as be able to be converted back to a type using AsType().
+            
+             This class simply implements some of the simple missing methods on Type to make it as API-compatible
+             as possible to TypeInfo.
+             </summary>
+        </member>
+        <member name="M:Parse.Internal.IParseCommandRunner.RunCommandAsync(Parse.Internal.ParseCommand,System.IProgress{Parse.ParseUploadProgressEventArgs},System.IProgress{Parse.ParseDownloadProgressEventArgs},System.Threading.CancellationToken)">
+            <summary>
+            Executes <see cref="T:Parse.Internal.ParseCommand"/> and convert the result into Dictionary.
+            </summary>
+            <param name="command">The command to be run.</param>
+            <param name="uploadProgress">Upload progress callback.</param>
+            <param name="downloadProgress">Download progress callback.</param>
+            <param name="cancellationToken">The cancellation token for the request.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Parse.Internal.ParseCommand">
+            <summary>
+            ParseCommand is an <see cref="T:Parse.Internal.HttpRequest"/> with pre-populated
+            headers.
+            </summary>
+        </member>
+        <member name="T:Parse.Internal.HttpRequest">
+            <summary>
+            <code>IHttpRequest</code> is an interface that provides an API to execute HTTP request data.
+            </summary>
+        </member>
+        <member name="P:Parse.Internal.HttpRequest.Data">
+            <summary>
+            Data stream to be uploaded.
+            </summary>
+        </member>
+        <member name="P:Parse.Internal.HttpRequest.Method">
+            <summary>
+            HTTP method. One of <c>DELETE</c>, <c>GET</c>, <c>HEAD</c>, <c>POST</c> or <c>PUT</c>
+            </summary>
+        </member>
         <member name="M:Parse.Internal.IParseAuthenticationProvider.AuthenticateAsync(System.Threading.CancellationToken)">
             <summary>
             Authenticates with the service.
@@ -100,6 +142,32 @@
             <typeparam name="TOut">The resulting type of value in the list.</typeparam>
             <typeparam name="TIn">The original type of value in the list.</typeparam>
         </member>
+        <member name="M:Parse.Internal.IHttpClient.ExecuteAsync(Parse.Internal.HttpRequest,System.IProgress{Parse.ParseUploadProgressEventArgs},System.IProgress{Parse.ParseDownloadProgressEventArgs},System.Threading.CancellationToken)">
+            <summary>
+            Executes HTTP request to a <see cref="P:Parse.Internal.HttpRequest.Uri"/> with <see cref="P:Parse.Internal.HttpRequest.Method"/> HTTP verb
+            and <see cref="P:Parse.Internal.HttpRequest.Headers"/>.
+            </summary>
+            <param name="httpRequest">The HTTP request to be executed.</param>
+            <param name="uploadProgress">Upload progress callback.</param>
+            <param name="downloadProgress">Download progress callback.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>A task that resolves to Htt</returns>
+        </member>
+        <member name="M:Parse.Internal.HttpClient.GetStatusCode(UnityEngine.WWW)">
+            <summary>
+            Gets the HTTP status code from finished <code>WWW</code> request.
+            </summary>
+            <param name="www">The WWW object.</param>
+            <returns>Returns 201 if there's no error. Otherwise, returns error status code.</returns>
+        </member>
+        <member name="M:Parse.Internal.HttpClient.GenerateWWWInstance(System.String,System.Byte[],System.Collections.Hashtable)">
+            <summary>
+            Unity changes its WWW constructor at 4.5.x from using <see cref="T:System.Collections.Hashtable"/> to using
+            <see cref="T:System.Collections.Generic.Dictionary`2"/>. We need to explicitly handle that. This method
+            generates a valid WWW instance depending on the newest WWW constructor
+            provided by used UnityEngine assembly
+            </summary>
+        </member>
         <member name="T:Parse.Internal.IdentityEqualityComparer`1">
             <summary>
             An equality comparer that uses the object identity (i.e. ReferenceEquals)
@@ -118,23 +186,67 @@
             </summary>
             <returns>An object to be JSONified.</returns>
         </member>
-        <member name="T:Parse.Internal.IHttpRequest">
+        <member name="M:Parse.Internal.IInstallationIdController.Set(System.Nullable{System.Guid})">
             <summary>
-            <code>IHttpRequest</code> is an interface that provides an API to execute HTTP request data.
+            Sets current <code>installationId</code> and saves it to local storage.
+            </summary>
+            <param name="installationId">The <code>installationId</code> to be saved.</param>
+        </member>
+        <member name="M:Parse.Internal.IInstallationIdController.Get">
+            <summary>
+            Gets current <code>installationId</code> from local storage. Generates a none exists.
+            </summary>
+            <returns>Current <code>installationid</code>.</returns>
+        </member>
+        <member name="M:Parse.Internal.IInstallationIdController.Clear">
+            <summary>
+            Clears current installationId from memory and local storage.
             </summary>
         </member>
-        <member name="M:Parse.Internal.IHttpRequest.ExecuteAsync(System.IProgress{Parse.ParseUploadProgressEventArgs},System.IProgress{Parse.ParseDownloadProgressEventArgs},System.Threading.CancellationToken)">
+        <member name="T:Parse.Internal.IParseObjectCurrentController`1">
             <summary>
-            Executes HTTP request to a <see cref="P:Parse.Internal.IHttpRequest.Uri"/> with <see cref="P:Parse.Internal.IHttpRequest.Method"/> HTTP verb and <see cref="P:Parse.Internal.IHttpRequest.Headers"/>.
+            <code>IParseObjectCurrentController</code> controls the single-instance <see cref="T:Parse.ParseObject"/>
+            persistence used throughout the code-base. Sample usages are <see cref="P:Parse.ParseUser.CurrentUser"/> and
+            <see cref="P:Parse.ParseInstallation.CurrentInstallation"/>.
             </summary>
-            <param name="uploadProgress">Upload progress callback.</param>
-            <param name="downloadProgress">Download progress callback.</param>
+            <typeparam name="T">Type of object being persisted.</typeparam>
+        </member>
+        <member name="M:Parse.Internal.IParseObjectCurrentController`1.SetAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Persists current <see cref="T:Parse.ParseObject"/>.
+            </summary>
+            <param name="obj"><see cref="T:Parse.ParseObject"/> to be persisted.</param>
             <param name="cancellationToken">The cancellation token.</param>
-            <returns>A task that resolves to Htt</returns>
         </member>
-        <member name="P:Parse.Internal.IHttpRequest.Method">
+        <member name="M:Parse.Internal.IParseObjectCurrentController`1.GetAsync(System.Threading.CancellationToken)">
             <summary>
-            HTTP method. One of <c>DELETE</c>, <c>GET</c>, <c>HEAD</c>, <c>POST</c> or <c>PUT</c>
+            Gets the persisted current <see cref="T:Parse.ParseObject"/>.
+            </summary>
+            <param name="cancellationToken">The cancellation token.</param>
+        </member>
+        <member name="M:Parse.Internal.IParseObjectCurrentController`1.ExistsAsync(System.Threading.CancellationToken)">
+            <summary>
+            Returns a <see cref="T:System.Threading.Tasks.Task"/> that resolves to <code>true</code> if current
+            <see cref="T:Parse.ParseObject"/> exists.
+            </summary>
+            <param name="cancellationToken">The cancellation token.</param>
+        </member>
+        <member name="M:Parse.Internal.IParseObjectCurrentController`1.IsCurrent(`0)">
+            <summary>
+            Returns <code>true</code> if the given <see cref="T:Parse.ParseObject"/> is the persisted current
+            <see cref="T:Parse.ParseObject"/>.
+            </summary>
+            <param name="obj">The object to check.</param>
+            <returns>True if <code>obj</code> is the current persisted <see cref="T:Parse.ParseObject"/>.</returns>
+        </member>
+        <member name="M:Parse.Internal.IParseObjectCurrentController`1.ClearFromMemory">
+            <summary>
+            Nullifies the current <see cref="T:Parse.ParseObject"/> from memory.
+            </summary>
+        </member>
+        <member name="M:Parse.Internal.IParseObjectCurrentController`1.ClearFromDisk">
+            <summary>
+            Clears current <see cref="T:Parse.ParseObject"/> from disk.
             </summary>
         </member>
         <member name="T:Parse.Internal.InternalExtensions">
@@ -211,7 +323,7 @@
             <param name="previous">The most recent operation on the field, or null if none.</param>
             <returns>A new ParseFieldOperation or this.</returns>
         </member>
-        <member name="M:Parse.Internal.IParseFieldOperation.Apply(System.Object,Parse.ParseObject,System.String)">
+        <member name="M:Parse.Internal.IParseFieldOperation.Apply(System.Object,System.String)">
             <summary>
             Returns a new estimated value based on a previous value and this operation. This
             value is not intended to be sent to Parse, but it is used locally on the client to
@@ -221,19 +333,21 @@
             that refer back to their parents.
             </summary>
             <param name="oldValue">The previous value for the field.</param>
-            <param name="obj">The object that contains this value.</param>
             <param name="key">The key that this value is for.</param>
             <returns>The new value for the field.</returns>
         </member>
-        <member name="M:Parse.Internal.IPlatformHooks.GetHttpRequest(System.Uri,System.String,System.IO.Stream,System.Collections.Generic.IList{System.Collections.Generic.KeyValuePair{System.String,System.String}})">
+        <member name="M:Parse.Internal.IPlatformHooks.ExecuteParseInstallationSaveHookAsync(Parse.ParseInstallation)">
             <summary>
-            Construct a platform specific <see cref="T:Parse.Internal.IHttpRequest"/> with custom <see cref="M:Parse.Internal.IHttpRequest.ExecuteAsync(System.IProgress{Parse.ParseUploadProgressEventArgs},System.IProgress{Parse.ParseDownloadProgressEventArgs},System.Threading.CancellationToken)"/> implementation.
+            Executes platform specific hook that mutate the installation based on
+            the device platforms.
             </summary>
-            <param name="uri">The Uri endpoint.</param>
-            <param name="method">The HTTP verb. One of <c>GET</c>, <c>HEAD</c>, <c>POST</c>, <c>PUT</c> or <c>DELETE</c>.</param>
-            <param name="data">Stream of data to be sent.</param>
-            <param name="headers">HTTP headers to be sent.</param>
-            <returns>Platform specific <see cref="T:Parse.Internal.IHttpRequest"/>.</returns>
+            <param name="installation">Installation to be mutated.</param>
+            <returns></returns>
+        </member>
+        <member name="P:Parse.Internal.IPlatformHooks.ApplicationSettings">
+            <summary>
+            A thread-safe dictionary that persists key-value pair objects to disk.
+            </summary>
         </member>
         <member name="T:Parse.Internal.Json">
             <summary>
@@ -257,7 +371,7 @@
         </member>
         <member name="M:Parse.Internal.Json.Encode(System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
-            Encodes a dictionary into a JSON string. Suppots values that are
+            Encodes a dictionary into a JSON string. Supports values that are
             IDictionary&lt;string, object&gt;, IList&lt;object&gt;, strings,
             nulls, and any of the primitive types.
             </summary>
@@ -670,31 +784,6 @@
             <param name="dotnetKey">The .NET API Key provided in the Parse dashboard.
             </param>
         </member>
-        <member name="M:Parse.ParseClient.RequestAsync(System.String,System.String,System.String,System.Collections.Generic.IDictionary{System.String,System.Object},System.Threading.CancellationToken)">
-            <summary>
-            Convenience alias for RequestAsync that takes a string instead of a Uri.
-            </summary>
-        </member>
-        <member name="M:Parse.ParseClient.RequestAsync(System.String,System.Uri,System.String,System.Collections.Generic.IDictionary{System.String,System.Object},System.Threading.CancellationToken)">
-            <summary>
-            The main mechanism for making requests to Parse. Attaches headers related to
-            the SDK, session token, etc., then JSON-parses the result of the request and throws
-            a ParseException if necessary.
-            </summary>
-            <param name="method">The HTTP method to use.</param>
-            <param name="relativeUri">A relative URI for the API.</param>
-            <param name="cancellationToken">The session token for the request.</param>
-            <param name="data">A JSON-style data object that will be stringified
-            for the request body.</param>
-            <param name="sessionToken">The cancellation token for the request.</param>
-            <returns>A tuple indicating the HTTP status code and the JSON data
-            returned by the request.</returns>
-        </member>
-        <member name="M:Parse.ParseClient.UploadAsync(System.Uri,System.String,System.String,System.IO.Stream,System.IProgress{Parse.ParseUploadProgressEventArgs},System.Threading.CancellationToken)">
-            <summary>
-            Performs an upload that reports progress.
-            </summary>
-        </member>
         <member name="M:Parse.ParseClient.As``1(System.Object)">
             <summary>
             Performs a ConvertTo, but returns null if the object can't be
@@ -722,16 +811,6 @@
             The map is:
                (object type, generic interface type) => constructed generic type
             </summary>
-        </member>
-        <member name="M:Parse.ParseClient.DeepTraversal(System.Object,System.Boolean,System.Boolean)">
-            <summary>
-            Flattens dictionaries and lists into a single enumerable of all contained objects
-            that can then be queried over.
-            </summary>
-            <param name="root">The root of the traversal</param>
-            <param name="traverseParseObjects">Whether to traverse into ParseObjects' children</param>
-            <param name="yieldRoot">Whether to include the root in the result</param>
-            <returns></returns>
         </member>
         <member name="T:Parse.ParseCloud">
             <summary>
@@ -1608,14 +1687,6 @@
             Allows subclasses to set values for non-pointer construction.
             </summary>
         </member>
-        <member name="M:Parse.ParseObject.GetFactory(System.String)">
-            <summary>
-            Gets the appropriate factory for the given class name. If there is no factory for the class,
-            a factory that produces a regular ParseObject will be created.
-            </summary>
-            <param name="className">The class name for the ParseObjects the factory will create.</param>
-            <returns></returns>
-        </member>
         <member name="M:Parse.ParseObject.RegisterSubclass``1">
             <summary>
             Registers a custom subclass type with the Parse SDK, enabling strong-typing of those ParseObjects whenever
@@ -1629,22 +1700,15 @@
             Clears any changes to this object made since the last call to <see cref="M:Parse.ParseObject.SaveAsync"/>.
             </summary>
         </member>
-        <member name="M:Parse.ParseObject.CheckpointMutableContainer(System.Object)">
+        <member name="M:Parse.ParseObject.DeepTraversal(System.Object,System.Boolean,System.Boolean)">
             <summary>
-            Updates the JSON cache value for the given object.
+            Flattens dictionaries and lists into a single enumerable of all contained objects
+            that can then be queried over.
             </summary>
-        </member>
-        <member name="M:Parse.ParseObject.CheckForChangesToMutableContainer(System.String,System.Object)">
-            <summary>
-            Inspects to see if a given mutable container owned by this object has
-            been mutated, and treats any mutation as a new "set" operation.
-            </summary>
-        </member>
-        <member name="M:Parse.ParseObject.CheckForChangesToMutableContainers">
-            <summary>
-            Inspects to see if any mutable container owned by this object has been mutated, and
-            treats any mutation as a new 'Set' operation.
-            </summary>
+            <param name="root">The root of the traversal</param>
+            <param name="traverseParseObjects">Whether to traverse into ParseObjects' children</param>
+            <param name="yieldRoot">Whether to include the root in the result</param>
+            <returns></returns>
         </member>
         <member name="M:Parse.ParseObject.CollectFetchedObjects">
             <summary>
@@ -1781,11 +1845,6 @@
             Removes a key from the object's data if it exists.
             </summary>
             <param name="key">The key to remove.</param>
-        </member>
-        <member name="M:Parse.ParseObject.ApplyOperations(System.Collections.Generic.IDictionary{System.String,Parse.Internal.IParseFieldOperation},System.Collections.Generic.IDictionary{System.String,System.Object})">
-            <summary>
-            Updates the estimated values in the map based on the given set of ParseFieldOperations.
-            </summary>
         </member>
         <member name="M:Parse.ParseObject.RebuildEstimatedData">
             <summary>
@@ -2037,21 +2096,9 @@
             Gets the class name for the ParseObject.
             </summary>
         </member>
-        <member name="P:Parse.ParseObject.PropertyMappings">
-            <summary>
-            Gets the set of fieldName->propertyName mappings for the current class.
-            </summary>
-        </member>
         <member name="E:Parse.ParseObject.PropertyChanged">
             <summary>
             Occurs when a property value changes.
-            </summary>
-        </member>
-        <member name="F:Parse.ParseInstallation.currentInstallationMatchesDisk">
-            <summary>
-            Whether the currentInstallation is known to match the serialized version on disk.
-            This is useful for saving a filesystem check if you try to load currentInstallation
-            frequently while there is none on disk.
             </summary>
         </member>
         <member name="M:Parse.ParseInstallation.#ctor">
@@ -2060,13 +2107,13 @@
             ParseInstallations yourself. Instead use <see cref="P:Parse.ParseInstallation.CurrentInstallation"/>.
             </summary>
         </member>
-        <member name="M:Parse.ParseInstallation.getLocaleIdentifier">
+        <member name="M:Parse.ParseInstallation.GetLocaleIdentifier">
             <summary>
             Gets the locale identifier in the format: [language code]-[COUNTRY CODE].
             </summary>
             <returns>The locale identifier in the format: [language code]-[COUNTRY CODE].</returns>
         </member>
-        <member name="F:Parse.ParseInstallation.tzNameMap">
+        <member name="F:Parse.ParseInstallation.TimeZoneNameMap">
             <summary>
             This mapping of Windows names to a standard everyone else uses is maintained 
             by the Unicode consortium, which makes this officially the first helpful
@@ -2075,35 +2122,6 @@
             Microsoft does not give us more granular location information.
             Built from http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/zone_tzid.html
             </summary>
-        </member>
-        <member name="M:Parse.ParseInstallation.getDeviceType">
-            <summary>
-            The runtime target of this application.
-            </summary>
-        </member>
-        <member name="M:Parse.ParseInstallation.getAppNameAsync">
-            <summary>
-            Gets the application name from <c>AndroidManifest.xml</c>.
-            </summary>
-            <returns>Application name.</returns>
-        </member>
-        <member name="M:Parse.ParseInstallation.getAppIdentifier">
-            <summary>
-            Gets the application unique identifier from <c>AndroidManifest.xml</c>.
-            </summary>
-            <returns>Application identifier.</returns>
-        </member>
-        <member name="M:Parse.ParseInstallation.getAppVersion">
-            <summary>
-            Gets the application version from <c>AndroidManifest.xml</c>.
-            </summary>
-            <returns>Application version.</returns>
-        </member>
-        <member name="M:Parse.ParseInstallation.getTimeZone">
-            <summary>
-            Gets current Timezone of the device.
-            </summary>
-            <returns>Current Timezone of the device.</returns>
         </member>
         <member name="M:Parse.ParseInstallation.SetDeviceTokenFromData(System.Byte[])">
             <summary>
@@ -2211,249 +2229,249 @@
         </member>
         <member name="M:Parse.ParsePush.SendAsync">
             <summary>
-             Request a push to be sent. When this task completes, Parse has successfully acknowledged a request
-             to send push notifications but has not necessarily finished sending all notifications
-             requested. The current status of recent push notifications can be seen in your Push Notifications
-             console on http://parse.com
+            Request a push to be sent. When this task completes, Parse has successfully acknowledged a request
+            to send push notifications but has not necessarily finished sending all notifications
+            requested. The current status of recent push notifications can be seen in your Push Notifications
+            console on http://parse.com
             </summary>
             <returns>A Task for continuation.</returns>
         </member>
         <member name="M:Parse.ParsePush.SendAsync(System.Threading.CancellationToken)">
             <summary>
-             Request a push to be sent. When this task completes, Parse has successfully acknowledged a request
-             to send push notifications but has not necessarily finished sending all notifications
-             requested. The current status of recent push notifications can be seen in your Push Notifications
-             console on http://parse.com
+            Request a push to be sent. When this task completes, Parse has successfully acknowledged a request
+            to send push notifications but has not necessarily finished sending all notifications
+            requested. The current status of recent push notifications can be seen in your Push Notifications
+            console on http://parse.com
             </summary>
             <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
         </member>
         <member name="M:Parse.ParsePush.SendAlertAsync(System.String)">
-            <summary>
-            Pushes a simple message to every device. This is shorthand for:
+             <summary>
+             Pushes a simple message to every device. This is shorthand for:
             
-            <code>
-            var push = new ParsePush();
-            push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
-            return push.SendAsync();
-            </code>
-            </summary>
-            <param name="alert">The alert message to send.</param>
+             <code>
+             var push = new ParsePush();
+             push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
+             return push.SendAsync();
+             </code>
+             </summary>
+             <param name="alert">The alert message to send.</param>
         </member>
         <member name="M:Parse.ParsePush.SendAlertAsync(System.String,System.String)">
-            <summary>
-            Pushes a simple message to every device subscribed to channel. This is shorthand for:
+             <summary>
+             Pushes a simple message to every device subscribed to channel. This is shorthand for:
             
-            <code>
-            var push = new ParsePush();
-            push.Channels = new List&lt;string&gt; { channel };
-            push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
-            return push.SendAsync();
-            </code>
-            </summary>
-            <param name="alert">The alert message to send.</param>
-            <param name="channel">An Installation must be subscribed to channel to receive this Push Notification.</param>
+             <code>
+             var push = new ParsePush();
+             push.Channels = new List&lt;string&gt; { channel };
+             push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
+             return push.SendAsync();
+             </code>
+             </summary>
+             <param name="alert">The alert message to send.</param>
+             <param name="channel">An Installation must be subscribed to channel to receive this Push Notification.</param>
         </member>
         <member name="M:Parse.ParsePush.SendAlertAsync(System.String,System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            Pushes a simple message to every device subscribed to any of channels. This is shorthand for:
+             <summary>
+             Pushes a simple message to every device subscribed to any of channels. This is shorthand for:
             
-            <code>
-            var push = new ParsePush();
-            push.Channels = channels;
-            push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
-            return push.SendAsync();
-            </code>
-            </summary>
-            <param name="alert">The alert message to send.</param>
-            <param name="channels">An Installation must be subscribed to any of channels to receive this Push Notification.</param>
+             <code>
+             var push = new ParsePush();
+             push.Channels = channels;
+             push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
+             return push.SendAsync();
+             </code>
+             </summary>
+             <param name="alert">The alert message to send.</param>
+             <param name="channels">An Installation must be subscribed to any of channels to receive this Push Notification.</param>
         </member>
         <member name="M:Parse.ParsePush.SendAlertAsync(System.String,Parse.ParseQuery{Parse.ParseInstallation})">
-            <summary>
-            Pushes a simple message to every device matching the target query. This is shorthand for:
+             <summary>
+             Pushes a simple message to every device matching the target query. This is shorthand for:
             
-            <code>
-            var push = new ParsePush();
-            push.Query = query;
-            push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
-            return push.SendAsync();
-            </code>
-            </summary>
-            <param name="alert">The alert message to send.</param>
-            <param name="query">A query filtering the devices which should receive this Push Notification.</param>
+             <code>
+             var push = new ParsePush();
+             push.Query = query;
+             push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
+             return push.SendAsync();
+             </code>
+             </summary>
+             <param name="alert">The alert message to send.</param>
+             <param name="query">A query filtering the devices which should receive this Push Notification.</param>
         </member>
         <member name="M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object})">
-            <summary>
-            Pushes an arbitrary payload to every device. This is shorthand for:
+             <summary>
+             Pushes an arbitrary payload to every device. This is shorthand for:
             
-            <code>
-            var push = new ParsePush();
-            push.Data = data;
-            return push.SendAsync();
-            </code>
-            </summary>
-            <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
+             <code>
+             var push = new ParsePush();
+             push.Data = data;
+             return push.SendAsync();
+             </code>
+             </summary>
+             <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
         </member>
         <member name="M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object},System.String)">
-            <summary>
-            Pushes an arbitrary payload to every device subscribed to channel. This is shorthand for:
+             <summary>
+             Pushes an arbitrary payload to every device subscribed to channel. This is shorthand for:
             
-            <code>
-            var push = new ParsePush();
-            push.Channels = new List&lt;string&gt; { channel };
-            push.Data = data;
-            return push.SendAsync();
-            </code>
-            </summary>
-            <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
-            <param name="channel">An Installation must be subscribed to channel to receive this Push Notification.</param>
+             <code>
+             var push = new ParsePush();
+             push.Channels = new List&lt;string&gt; { channel };
+             push.Data = data;
+             return push.SendAsync();
+             </code>
+             </summary>
+             <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
+             <param name="channel">An Installation must be subscribed to channel to receive this Push Notification.</param>
         </member>
         <member name="M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object},System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            Pushes an arbitrary payload to every device subscribed to any of channels. This is shorthand for:
+             <summary>
+             Pushes an arbitrary payload to every device subscribed to any of channels. This is shorthand for:
             
-            <code>
-            var push = new ParsePush();
-            push.Channels = channels;
-            push.Data = data;
-            return push.SendAsync();
-            </code>
-            </summary>
-            <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
-            <param name="channels">An Installation must be subscribed to any of channels to receive this Push Notification.</param>
+             <code>
+             var push = new ParsePush();
+             push.Channels = channels;
+             push.Data = data;
+             return push.SendAsync();
+             </code>
+             </summary>
+             <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
+             <param name="channels">An Installation must be subscribed to any of channels to receive this Push Notification.</param>
         </member>
         <member name="M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object},Parse.ParseQuery{Parse.ParseInstallation})">
-            <summary>
-            Pushes an arbitrary payload to every device matching target. This is shorthand for:
+             <summary>
+             Pushes an arbitrary payload to every device matching target. This is shorthand for:
             
-            <code>
-            var push = new ParsePush();
-            push.Query = query
-            push.Data = data;
-            return push.SendAsync();
-            </code>
-            </summary>
-            <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
-            <param name="query">A query filtering the devices which should receive this Push Notification.</param>
+             <code>
+             var push = new ParsePush();
+             push.Query = query
+             push.Data = data;
+             return push.SendAsync();
+             </code>
+             </summary>
+             <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
+             <param name="query">A query filtering the devices which should receive this Push Notification.</param>
         </member>
         <member name="M:Parse.ParsePush.SubscribeAsync(System.String)">
-            <summary>
-            Subscribe the current installation to this channel. This is shorthand for:
+             <summary>
+             Subscribe the current installation to this channel. This is shorthand for:
             
-            <code>
-            var installation = ParseInstallation.CurrentInstallation;
-            installation.AddUniqueToList("channels", channel);
-            installation.SaveAsync();
-            </code>
-            </summary>
-            <param name="channel">The channel to which this installation should subscribe.</param>
+             <code>
+             var installation = ParseInstallation.CurrentInstallation;
+             installation.AddUniqueToList("channels", channel);
+             installation.SaveAsync();
+             </code>
+             </summary>
+             <param name="channel">The channel to which this installation should subscribe.</param>
         </member>
         <member name="M:Parse.ParsePush.SubscribeAsync(System.String,System.Threading.CancellationToken)">
-            <summary>
-            Subscribe the current installation to this channel. This is shorthand for:
+             <summary>
+             Subscribe the current installation to this channel. This is shorthand for:
             
-            <code>
-            var installation = ParseInstallation.CurrentInstallation;
-            installation.AddUniqueToList("channels", channel);
-            installation.SaveAsync(cancellationToken);
-            </code>
-            </summary>
-            <param name="channel">The channel to which this installation should subscribe.</param>
-            <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
+             <code>
+             var installation = ParseInstallation.CurrentInstallation;
+             installation.AddUniqueToList("channels", channel);
+             installation.SaveAsync(cancellationToken);
+             </code>
+             </summary>
+             <param name="channel">The channel to which this installation should subscribe.</param>
+             <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
         </member>
         <member name="M:Parse.ParsePush.SubscribeAsync(System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            Subscribe the current installation to these channels. This is shorthand for:
+             <summary>
+             Subscribe the current installation to these channels. This is shorthand for:
             
-            <code>
-            var installation = ParseInstallation.CurrentInstallation;
-            installation.AddRangeUniqueToList("channels", channels);
-            installation.SaveAsync();
-            </code>
-            </summary>
-            <param name="channels">The channels to which this installation should subscribe.</param>
+             <code>
+             var installation = ParseInstallation.CurrentInstallation;
+             installation.AddRangeUniqueToList("channels", channels);
+             installation.SaveAsync();
+             </code>
+             </summary>
+             <param name="channels">The channels to which this installation should subscribe.</param>
         </member>
         <member name="M:Parse.ParsePush.SubscribeAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)">
-            <summary>
-            Subscribe the current installation to these channels. This is shorthand for:
+             <summary>
+             Subscribe the current installation to these channels. This is shorthand for:
             
-            <code>
-            var installation = ParseInstallation.CurrentInstallation;
-            installation.AddRangeUniqueToList("channels", channels);
-            installation.SaveAsync(cancellationToken);
-            </code>
-            </summary>
-            <param name="channels">The channels to which this installation should subscribe.</param>
-            <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
+             <code>
+             var installation = ParseInstallation.CurrentInstallation;
+             installation.AddRangeUniqueToList("channels", channels);
+             installation.SaveAsync(cancellationToken);
+             </code>
+             </summary>
+             <param name="channels">The channels to which this installation should subscribe.</param>
+             <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
         </member>
         <member name="M:Parse.ParsePush.UnsubscribeAsync(System.String)">
-            <summary>
-            Unsubscribe the current installation from this channel. This is shorthand for:
+             <summary>
+             Unsubscribe the current installation from this channel. This is shorthand for:
             
-            <code>
-            var installation = ParseInstallation.CurrentInstallation;
-            installation.Remove("channels", channel);
-            installation.SaveAsync();
-            </code>
-            </summary>
-            <param name="channel">The channel from which this installation should unsubscribe.</param>
+             <code>
+             var installation = ParseInstallation.CurrentInstallation;
+             installation.Remove("channels", channel);
+             installation.SaveAsync();
+             </code>
+             </summary>
+             <param name="channel">The channel from which this installation should unsubscribe.</param>
         </member>
         <member name="M:Parse.ParsePush.UnsubscribeAsync(System.String,System.Threading.CancellationToken)">
-            <summary>
-            Unsubscribe the current installation from this channel. This is shorthand for:
+             <summary>
+             Unsubscribe the current installation from this channel. This is shorthand for:
             
-            <code>
-            var installation = ParseInstallation.CurrentInstallation;
-            installation.Remove("channels", channel);
-            installation.SaveAsync(cancellationToken);
-            </code>
-            </summary>
-            <param name="channel">The channel from which this installation should unsubscribe.</param>
-            <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
+             <code>
+             var installation = ParseInstallation.CurrentInstallation;
+             installation.Remove("channels", channel);
+             installation.SaveAsync(cancellationToken);
+             </code>
+             </summary>
+             <param name="channel">The channel from which this installation should unsubscribe.</param>
+             <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
         </member>
         <member name="M:Parse.ParsePush.UnsubscribeAsync(System.Collections.Generic.IEnumerable{System.String})">
-            <summary>
-            Unsubscribe the current installation from these channels. This is shorthand for:
+             <summary>
+             Unsubscribe the current installation from these channels. This is shorthand for:
             
-            <code>
-            var installation = ParseInstallation.CurrentInstallation;
-            installation.RemoveAllFromList("channels", channels);
-            installation.SaveAsync();
-            </code>
-            </summary>
-            <param name="channels">The channels from which this installation should unsubscribe.</param>
+             <code>
+             var installation = ParseInstallation.CurrentInstallation;
+             installation.RemoveAllFromList("channels", channels);
+             installation.SaveAsync();
+             </code>
+             </summary>
+             <param name="channels">The channels from which this installation should unsubscribe.</param>
         </member>
         <member name="M:Parse.ParsePush.UnsubscribeAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)">
-            <summary>
-            Unsubscribe the current installation from these channels. This is shorthand for:
+             <summary>
+             Unsubscribe the current installation from these channels. This is shorthand for:
             
-            <code>
-            var installation = ParseInstallation.CurrentInstallation;
-            installation.RemoveAllFromList("channels", channels);
-            installation.SaveAsync(cancellationToken);
-            </code>
-            </summary>
-            <param name="channels">The channels from which this installation should unsubscribe.</param>
-            <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
+             <code>
+             var installation = ParseInstallation.CurrentInstallation;
+             installation.RemoveAllFromList("channels", channels);
+             installation.SaveAsync(cancellationToken);
+             </code>
+             </summary>
+             <param name="channels">The channels from which this installation should unsubscribe.</param>
+             <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
         </member>
         <member name="P:Parse.ParsePush.Query">
             <summary>
-            An installation query that specifies which installations shoudl receive
+            An installation query that specifies which installations should receive
             this push.
             This should not be used in tandem with Channels.
             </summary>
         </member>
         <member name="P:Parse.ParsePush.Channels">
-            <summary>
-            A short-hand to set a query which only discriminates on the channels to which a device is subscribed.
-            This is shorthand for:
+             <summary>
+             A short-hand to set a query which only discriminates on the channels to which a device is subscribed.
+             This is shorthand for:
             
-            <code>
-            var push = new Push();
-            push.Query = ParseInstallation.Query.WhereKeyContainedIn("channels", channels);
-            </code>
+             <code>
+             var push = new Push();
+             push.Query = ParseInstallation.Query.WhereKeyContainedIn("channels", channels);
+             </code>
             
-            This cannot be used in tandem with Query.
-            </summary>
+             This cannot be used in tandem with Query.
+             </summary>
         </member>
         <member name="P:Parse.ParsePush.Expiration">
             <summary>
@@ -2479,15 +2497,15 @@
             </summary>
         </member>
         <member name="P:Parse.ParsePush.Alert">
-            <summary>
-            A conveninence method which sets Data to a dictionary with alert as its only field. Equivalent to
+             <summary>
+             A conveninence method which sets Data to a dictionary with alert as its only field. Equivalent to
             
-            <code>
-            Data = new Dictionary&lt;string, object&gt; {{"alert", alert}};
-            </code>
+             <code>
+             Data = new Dictionary&lt;string, object&gt; {{"alert", alert}};
+             </code>
             
-            This should not be used in tandem with Data.
-            </summary>
+             This should not be used in tandem with Data.
+             </summary>
         </member>
         <member name="E:Parse.ParsePush.ParsePushNotificationReceived">
             <summary>
@@ -2543,7 +2561,7 @@
              </code>
              </example>
         </member>
-        <member name="M:Parse.ParseQuery`1.#ctor(Parse.ParseQuery{`0},System.Collections.Generic.IDictionary{System.String,System.Object},System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Parse.ParseQuery`1.#ctor(Parse.ParseQuery{`0},System.Collections.Generic.IDictionary{System.String,System.Object},System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String},System.Nullable{System.Int32},System.Nullable{System.Int32},System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.String},System.String)">
             <summary>
             Private constructor for composition of queries. A source query is required,
             but the remaining values can be null if they won't be changed in this
@@ -2586,27 +2604,27 @@
             <returns>A new query with the additional constraint.</returns>
         </member>
         <member name="M:Parse.ParseQuery`1.ThenBy(System.String)">
-            <summary>
-            Sorts the results in ascending order by the given key, after previous
-            ordering has been applied.
+             <summary>
+             Sorts the results in ascending order by the given key, after previous
+             ordering has been applied.
             
-            This method can only be called if there is already an <see cref="M:Parse.ParseQuery`1.OrderBy(System.String)"/>
-            or <see cref="M:Parse.ParseQuery`1.OrderByDescending(System.String)"/>
-            on this query.
-            </summary>
-            <param name="key">The key to order by.</param>
-            <returns>A new query with the additional constraint.</returns>
+             This method can only be called if there is already an <see cref="M:Parse.ParseQuery`1.OrderBy(System.String)"/>
+             or <see cref="M:Parse.ParseQuery`1.OrderByDescending(System.String)"/>
+             on this query.
+             </summary>
+             <param name="key">The key to order by.</param>
+             <returns>A new query with the additional constraint.</returns>
         </member>
         <member name="M:Parse.ParseQuery`1.ThenByDescending(System.String)">
-            <summary>
-            Sorts the results in descending order by the given key, after previous
-            ordering has been applied.
+             <summary>
+             Sorts the results in descending order by the given key, after previous
+             ordering has been applied.
             
-            This method can only be called if there is already an <see cref="M:Parse.ParseQuery`1.OrderBy(System.String)"/>
-            or <see cref="M:Parse.ParseQuery`1.OrderByDescending(System.String)"/> on this query.
-            </summary>
-            <param name="key">The key to order by.</param>
-            <returns>A new query with the additional constraint.</returns>
+             This method can only be called if there is already an <see cref="M:Parse.ParseQuery`1.OrderBy(System.String)"/>
+             or <see cref="M:Parse.ParseQuery`1.OrderByDescending(System.String)"/> on this query.
+             </summary>
+             <param name="key">The key to order by.</param>
+             <returns>A new query with the additional constraint.</returns>
         </member>
         <member name="M:Parse.ParseQuery`1.Include(System.String)">
             <summary>
@@ -2950,11 +2968,6 @@
             <param name="cancellationToken">The cancellation token.</param>
             <returns>The ParseObject for the given objectId.</returns>
         </member>
-        <member name="P:Parse.ParseQuery`1.JsonString">
-            <summary>
-            For debugging purposes.
-            </summary>
-        </member>
         <member name="T:Parse.ParseRelationBase">
             <summary>
             A common base class for ParseRelations.
@@ -3078,18 +3091,6 @@
         <member name="T:Parse.ParseUser">
             <summary>
             Represents a user for a Parse application.
-            </summary>
-        </member>
-        <member name="F:Parse.ParseUser.currentUserMatchesDisk">
-            <summary>
-            Whether the currentUser is known to match the serialized version on disk.
-            This is useful for saving a filesystem check if you try to load currentUser
-            frequently while there is none on disk.
-            </summary>
-        </member>
-        <member name="M:Parse.ParseUser.#ctor">
-            <summary>
-            Constructs a new ParseUser with no data.
             </summary>
         </member>
         <member name="M:Parse.ParseUser.Remove(System.String)">
@@ -3304,14 +3305,6 @@
             on the PlatformHooks class, these types will be AOT-compiled.
             </summary>
         </member>
-        <member name="M:Parse.PlatformHooks.GenerateWWWInstance(System.String,System.Byte[],System.Collections.Hashtable)">
-            <summary>
-            Unity changes its WWW constructor at 4.5.x from using <see cref="T:System.Collections.Hashtable"/> to using
-            <see cref="T:System.Collections.Generic.Dictionary`2"/>. We need to explicitly handle that. This method
-            generates a valid WWW instance depending on the newest WWW constructor
-            provided by used UnityEngine assembly
-            </summary>
-        </member>
         <member name="M:Parse.PlatformHooks.RegisterNetworkRequest(UnityEngine.WWW,System.Action{UnityEngine.WWW})">
             <summary>
             Registers a callback for network requests, running the callback on the main thread until
@@ -3376,13 +3369,6 @@
             Provides a dictionary that gets persisted on the filesystem between runs of the app.
             This is analogous to NSUserDefaults in iOS.
             </summary>
-        </member>
-        <member name="M:Parse.PlatformHooks.HttpRequestUnity.getStatusCode(UnityEngine.WWW)">
-            <summary>
-            Gets the HTTP status code from finished <code>WWW</code> request.
-            </summary>
-            <param name="www">The WWW object.</param>
-            <returns>Returns 201 if there's no error. Otherwise, returns error status code.</returns>
         </member>
         <member name="T:Parse.PlatformHooks.SettingsWrapper">
             <summary>
@@ -3742,6 +3728,65 @@
             <param name="task">The task to unwrap.</param>
             <returns>A new task that is complete when both the outer and inner tasks
             are complete and that has the inner task's result.</returns>
+        </member>
+        <member name="M:Parse.Internal.IParseConfigController.FetchConfigAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Fetchs the config from the server asynchrounously.
+            </summary>
+            <returns>The config async.</returns>
+            <param name="sessionToken">Session token.</param>
+            <param name="cancellationToken">Cancellation token.</param>
+        </member>
+        <member name="P:Parse.Internal.IParseConfigController.CurrentConfigController">
+            <summary>
+            Gets the current config controller.
+            </summary>
+            <value>The current config controller.</value>
+        </member>
+        <member name="M:Parse.Internal.IParseCurrentConfigController.GetCurrentConfigAsync">
+            <summary>
+            Gets the current config async.
+            </summary>
+            <returns>The current config async.</returns>
+        </member>
+        <member name="M:Parse.Internal.IParseCurrentConfigController.SetCurrentConfigAsync(Parse.ParseConfig)">
+            <summary>
+            Sets the current config async.
+            </summary>
+            <returns>The current config async.</returns>
+            <param name="config">Config.</param>
+        </member>
+        <member name="M:Parse.Internal.IParseCurrentConfigController.ClearCurrentConfigAsync">
+            <summary>
+            Clears the current config async.
+            </summary>
+            <returns>The current config async.</returns>
+        </member>
+        <member name="M:Parse.Internal.IParseCurrentConfigController.ClearCurrentConfigInMemoryAsync">
+            <summary>
+            Clears the current config in memory async.
+            </summary>
+            <returns>The current config in memory async.</returns>
+        </member>
+        <member name="T:Parse.Internal.ParseConfigController">
+            <summary>
+            Config controller.
+            </summary>
+        </member>
+        <member name="M:Parse.Internal.ParseConfigController.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Parse.Internal.ParseConfigController"/> class.
+            </summary>
+        </member>
+        <member name="T:Parse.Internal.ParseCurrentConfigController">
+            <summary>
+            Parse current config controller.
+            </summary>
+        </member>
+        <member name="M:Parse.Internal.ParseCurrentConfigController.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Parse.Internal.ParseCurrentConfigController"/> class.
+            </summary>
         </member>
     </members>
 </doc>

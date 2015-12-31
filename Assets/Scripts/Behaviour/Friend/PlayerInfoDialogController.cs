@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using Parse;
 
 public class PlayerInfoDialogController : Singleton<PlayerInfoDialogController>
 {
@@ -65,5 +67,31 @@ public class PlayerInfoDialogController : Singleton<PlayerInfoDialogController>
         PlayerData.Current.Save();
 
         FriendDialogController.Instance.Reload();
+    }
+
+    public void OnInviteClick()
+    {
+        if (Application.loadedLevelName != "Scene_Wating_Friend")
+        {
+            InviteFriendManager.firstInviteTo = friend.Id;
+            Application.LoadLevel("Scene_Wating_Friend");
+        }
+        else
+        {
+            var param = new Dictionary<string, object>();
+            param.Add("from", PlayerData.Current.name);
+            param.Add("to", friend.Id);
+            param.Add("room", PhotonNetwork.room.name);
+
+            var taskSync = ParseCloud.CallFunctionAsync<string>("invite", param).ContinueWith(t2 =>
+            {
+                if (t2.IsCompleted)
+                {
+                    
+                }
+            });
+
+            animator.SetBool("isDisappear", true);
+        }        
     }
 }

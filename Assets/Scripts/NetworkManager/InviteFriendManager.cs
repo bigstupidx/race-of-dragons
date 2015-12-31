@@ -2,13 +2,21 @@
 using System.Collections;
 using UnityEngine.UI;
 using System;
+using System.Collections.Generic;
+using Parse;
 
 public class InviteFriendManager : Photon.MonoBehaviour
 {
+    public static string roomName = "";
+    public static string firstInviteTo = "";
+
     public GameObject friendDialogPrefab;
     public Text textCountDown;
 
     public Transform[] cardHolders;
+
+    public GameObject playButton;
+    public GameObject inviteFriendButton;
 
     private bool connectFailed = false;
     private bool joined = false;
@@ -42,12 +50,21 @@ public class InviteFriendManager : Photon.MonoBehaviour
 
     public void OnJoinedLobby()
     {
-        PhotonNetwork.JoinRandomRoom();
+        if (!string.IsNullOrEmpty(roomName))
+        {
+            PhotonNetwork.JoinRoom(roomName);
+        }
+        else
+        {
+            PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 4, isVisible = false }, TypedLobby.Default);
+        }
     }
 
     public void OnJoinedRoom()
     {
         Debug.Log("OnJoinedRoom");
+        roomName = null;        
+
         joined = true;
         string dragonType = PlayerData.Current.CurrentDragon.element.ToString();
 
@@ -60,6 +77,12 @@ public class InviteFriendManager : Photon.MonoBehaviour
 
         player.transform.parent = cardHolders[PhotonNetwork.playerList.Length - 1];
         player.transform.localPosition = Vector3.zero;
+
+        if (PhotonNetwork.isMasterClient)
+        {
+            playButton.SetActive(true);
+            inviteFriendButton.SetActive(true);
+        }
     }
 
     public void OnPhotonInstantiate(PhotonMessageInfo info)
@@ -78,15 +101,29 @@ public class InviteFriendManager : Photon.MonoBehaviour
     {
     }
 
-    public void OnPhotonRandomJoinFailed()
-    {       
-        Debug.Log("OnPhotonRandomJoinFailed got called. Happens if no room is available (or all full or invisible or closed). JoinrRandom filter-options can limit available rooms.");
-        PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 3 }, TypedLobby.Default);
-    }
+    //public void OnPhotonRandomJoinFailed()
+    //{       
+    //    Debug.Log("OnPhotonRandomJoinFailed got called. Happens if no room is available (or all full or invisible or closed). JoinrRandom filter-options can limit available rooms.");
+    //    PhotonNetwork.CreateRoom(null, new RoomOptions() { maxPlayers = 4 }, TypedLobby.Default);
+    //}
 
     public void OnCreatedRoom()
     {
         Debug.Log("OnCreatedRoom");
+        var param = new Dictionary<string, object>();
+        param.Add("from", PlayerData.Current.name);
+        param.Add("to", firstInviteTo);
+        param.Add("room", PhotonNetwork.room.name);
+
+        var taskSync = ParseCloud.CallFunctionAsync<string>("invite", param).ContinueWith(t2 =>
+        {
+            if (t2.IsCompleted)
+            {
+                            
+            }
+        });
+
+        firstInviteTo = "";
     }
 
     public void OnDisconnectedFromPhoton()
@@ -149,7 +186,9 @@ public class InviteFriendManager : Photon.MonoBehaviour
     #region UI Delegate
     public void OnBackClick()
     {
-
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
+        Application.LoadLevel("Scene_MainMenu");
     }
 
     public void OnPlayClick()

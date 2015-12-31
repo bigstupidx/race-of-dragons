@@ -195,6 +195,10 @@ public class LoginManager : MonoBehaviour {
                 PlayerData.Current.name = ParseUser.CurrentUser.Username;
             PlayerData.Current.Save();
 
+            var installation = ParseInstallation.CurrentInstallation;
+            installation["userId"] = PlayerData.Current.id;
+            installation.SaveAsync();
+
             var param = new Dictionary<string, object>();
             param.Add("data", PlayerData.Current.ToDictionary());
 

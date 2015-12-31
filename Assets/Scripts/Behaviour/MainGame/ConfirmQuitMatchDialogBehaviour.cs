@@ -13,6 +13,7 @@ public class ConfirmQuitMatchDialogBehaviour : Singleton<ConfirmQuitMatchDialogB
 	public void OnQuit()
     {
         PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
         Application.LoadLevel("Scene_MainMenu");
     }
 

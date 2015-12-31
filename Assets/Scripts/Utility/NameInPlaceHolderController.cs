@@ -10,11 +10,12 @@ public class NameInPlaceHolderController : MonoBehaviour
 	void Start ()
     {
         text = GetComponent<TextMesh>();
+        text.text = "";
 	}
 		
 	void Update ()
     {
-	    if (string.IsNullOrEmpty(text.text))
+	    if (string.IsNullOrEmpty(text.text) && PhotonNetwork.connected)
         {
             if (PhotonNetwork.playerList.Length > position)
             {

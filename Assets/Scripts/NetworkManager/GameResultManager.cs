@@ -52,7 +52,7 @@ public class GameResultManager : Photon.MonoBehaviour
 
     public void OnReplayClick()
     {
-        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.LeaveRoom();        
         Application.LoadLevel("Scene_Select_Mode");
     }
 }

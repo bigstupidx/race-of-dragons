@@ -159,7 +159,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
 
     void Update()
     {
-        if (joined)
+        if (joined && PhotonNetwork.connected)
         {
             timeStart = GameUtils.GetRoomCustomProperty<float>("START_TIME", 0);
             if (!isStartGame && PhotonNetwork.playerList.Length >= 2 && timeStart == 0)
@@ -192,4 +192,12 @@ public class RandomMatchMaker : Photon.MonoBehaviour
         
     }
 
+    #region UI Delegate
+    public void OnBackClick()
+    {
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
+        Application.LoadLevel("Scene_MainMenu");
+    }
+    #endregion
 }
