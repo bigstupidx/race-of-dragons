@@ -49,11 +49,6 @@ public class PushBehaviour : MonoBehaviour {
         };
     }
 
-    void OnGUI()
-    {
-        GUI.Label(new Rect(0, 0, 500, 500), "Message: " + msg);
-    }
-
     void ShowInviteDialog(string from, string roomName)
     {
         GameObject inviteDialog = Instantiate(Resources.Load("Prefabs/UI/InviteDialog")) as GameObject;

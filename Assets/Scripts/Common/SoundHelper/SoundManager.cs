@@ -3,6 +3,27 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
+public enum ESound
+{
+    Click = 0,
+    Eagle,
+    Energy,
+    Fire,
+    Fly,
+    Go,
+    Ice,
+    Pickup,
+    Ready,
+    Rocket,
+    Shield,
+    SpeedUp,
+    Start,
+    Thunder,
+    Tick,
+    BGM_Menu,
+    BGM_Game
+}
+
 public class SoundManager : Singleton<SoundManager>
 {
 
@@ -13,6 +34,27 @@ public class SoundManager : Singleton<SoundManager>
 
     public bool clearAllAudioClipsOnLevelLoad = true;
 
+    [Header("Sound")]
+    public AudioClip buttonClickSound;
+    public AudioClip eagleSound;
+    public AudioClip energySound;
+    public AudioClip fireSound;
+    public AudioClip flySound;
+    public AudioClip goSound;
+    public AudioClip iceSound;
+    public AudioClip pickupSound;
+    public AudioClip readySound;
+    public AudioClip rocketSound;
+    public AudioClip shieldSound;
+    public AudioClip speedUpSound;
+    public AudioClip startSound;
+    public AudioClip thunderSound;
+    public AudioClip tickSound;
+
+    [Header("Music")]
+    public AudioClip[] bgmMenu;
+    public AudioClip[] bgmGame;
+
     [NonSerialized]
     public SKSound backgroundSound;
     private SKSound oneShotSound;
@@ -20,6 +62,7 @@ public class SoundManager : Singleton<SoundManager>
     private Stack<SKSound> _availableSounds;
     private List<SKSound> _playingSounds;
 
+    [HideInInspector] public bool isPlayMenuBgm;
 
     #region MonoBehaviour
 
@@ -97,6 +140,9 @@ public class SoundManager : Singleton<SoundManager>
     /// <param name="loop">If set to <c>true</c> loop.</param>
     public void playBackgroundMusic(AudioClip audioClip, float volume, bool loop = true)
     {
+        if (PlayerPrefs.GetInt("MUSIC", 1) == 0)
+            return;
+
         if (backgroundSound == null)
             backgroundSound = new SKSound(this);
 
@@ -104,6 +150,22 @@ public class SoundManager : Singleton<SoundManager>
         backgroundSound.setLoop(loop);
     }
 
+    public void playMenuBackgroundMusic(bool forcePlay = false)
+    {
+        if (!isPlayMenuBgm || forcePlay)
+        {
+            isPlayMenuBgm = true;
+            AudioClip clip = bgmMenu[UnityEngine.Random.Range(0, bgmMenu.Length)];
+            playBackgroundMusic(clip, 1f);
+        }        
+    }
+
+    public void playGameBackgroundMusic()
+    {
+        isPlayMenuBgm = false;
+        AudioClip clip = bgmGame[UnityEngine.Random.Range(0, bgmGame.Length)];
+        playBackgroundMusic(clip, 0.1f);
+    }
 
     /// <summary>
     /// fetches any AudioSource it can find and uses the standard PlayOneShot to play. Use this if you don't require any
@@ -129,9 +191,66 @@ public class SoundManager : Singleton<SoundManager>
     /// <param name="audioClip">Audio clip.</param>
     public SKSound playSound(AudioClip audioClip)
     {
+        if (PlayerPrefs.GetInt("SOUND", 1) == 0)
+            return null;
+
         return playSound(audioClip, 1f);
     }
 
+    public SKSound playButtonSound()
+    {
+        return playSound(buttonClickSound);
+    }
+
+    public AudioClip getAudioClip(ESound _sound)
+    {
+        switch (_sound)
+        {
+            case ESound.Click:
+                return buttonClickSound;
+            case ESound.Eagle:
+                return eagleSound;
+            case ESound.Energy:
+                return energySound;
+            case ESound.Fire:
+                return fireSound;
+            case ESound.Fly:
+                return flySound;
+            case ESound.Go:
+                return goSound;
+            case ESound.Ice:
+                return iceSound;
+            case ESound.Pickup:
+                return pickupSound;
+            case ESound.Ready:
+                return readySound;
+            case ESound.Rocket:
+                return rocketSound;
+            case ESound.Shield:
+                return shieldSound;
+            case ESound.SpeedUp:
+                return speedUpSound;
+            case ESound.Start:
+                return startSound;
+            case ESound.Thunder:
+                return thunderSound;
+            case ESound.Tick:
+                return tickSound;
+        }
+        return null;
+    }
+
+    public SKSound playSound(ESound _sound)
+    {
+        AudioClip audioClip = getAudioClip(_sound);
+
+        if (audioClip != null)
+        {
+            return playSound(audioClip);
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// plays the AudioClip with the specified volume

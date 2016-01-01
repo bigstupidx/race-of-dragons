@@ -56,11 +56,13 @@ public class WarningDialogController : Singleton<WarningDialogController>
 
     public void OnCancle()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
     }
 
     public void OnAccept()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
         if (onAccept != null)
             onAccept();

@@ -36,7 +36,7 @@ public class GameResultManager : Photon.MonoBehaviour
             listItemResult[pos].LoadAvatar(avatarUrl);
         }
 
-
+        SoundManager.Instance.playMenuBackgroundMusic();
     }
 		
 	void Update ()
@@ -46,12 +46,14 @@ public class GameResultManager : Photon.MonoBehaviour
 
     public void OnHomeClick()
     {
+        SoundManager.Instance.playButtonSound();
         PhotonNetwork.LeaveRoom();
         Application.LoadLevel("Scene_MainMenu");
     }
 
     public void OnReplayClick()
     {
+        SoundManager.Instance.playButtonSound();
         PhotonNetwork.LeaveRoom();        
         Application.LoadLevel("Scene_Select_Mode");
     }

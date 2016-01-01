@@ -195,6 +195,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
     #region UI Delegate
     public void OnBackClick()
     {
+        SoundManager.Instance.playButtonSound();
         PhotonNetwork.LeaveRoom();
         PhotonNetwork.Disconnect();
         Application.LoadLevel("Scene_MainMenu");

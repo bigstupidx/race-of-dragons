@@ -12,6 +12,7 @@ public class ConfirmQuitMatchDialogBehaviour : Singleton<ConfirmQuitMatchDialogB
 		
 	public void OnQuit()
     {
+        SoundManager.Instance.playButtonSound();
         PhotonNetwork.LeaveRoom();
         PhotonNetwork.Disconnect();
         Application.LoadLevel("Scene_MainMenu");
@@ -19,6 +20,7 @@ public class ConfirmQuitMatchDialogBehaviour : Singleton<ConfirmQuitMatchDialogB
 
     public void OnCancle()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
     }    
 

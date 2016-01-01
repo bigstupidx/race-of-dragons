@@ -59,6 +59,8 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 
         GameObject victory = GameObject.FindGameObjectWithTag("Victory") as GameObject;
         playerController.victoryPos = victory.transform.position;
+
+        SoundManager.Instance.playGameBackgroundMusic();
     }
 
     void Update()
@@ -195,6 +197,7 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 
     public void OnQuitMatch()
     {
+        SoundManager.Instance.playButtonSound();
         ConfirmQuitMatchDialogBehaviour.Instance.Show();
     }
 }

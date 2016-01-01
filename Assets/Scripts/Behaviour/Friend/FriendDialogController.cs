@@ -82,6 +82,7 @@ public class FriendDialogController : Singleton<FriendDialogController>
 
     public void OnBackClick()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
     }
 
@@ -93,6 +94,7 @@ public class FriendDialogController : Singleton<FriendDialogController>
 
     public void OnMoreFriendClick()
     {
+        SoundManager.Instance.playButtonSound();
         Instantiate(moreFriendDialogPrefab);
     }
 }

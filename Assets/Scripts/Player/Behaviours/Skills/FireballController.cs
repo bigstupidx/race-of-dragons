@@ -28,6 +28,8 @@ public class FireballController : Photon.PunBehaviour
         // Network
         playerId = photonView.ownerId;
         radar.playerId = playerId;
+
+        SoundManager.Instance.playSound(ESound.Fire);
     }
 		
 	void Update ()

@@ -71,6 +71,7 @@ public class ChatEmojiController : MonoBehaviour
 
     public void OnEditClick()
     {
+        SoundManager.Instance.playButtonSound();
         var keyboard = TouchScreenKeyboard.Open(chatItem.Text, TouchScreenKeyboardType.ASCIICapable);
         StartCoroutine(_OnChangeTextDone(keyboard));
     }

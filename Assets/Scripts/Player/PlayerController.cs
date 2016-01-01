@@ -373,6 +373,7 @@ public class PlayerController : Photon.PunBehaviour
         {
             if (skillController != null)
             {
+                SoundManager.Instance.playSound(ESound.Energy);
                 float duration = PlayerData.Current.items[currentItem.ToString()].GetDuration();
                 skillController.ReduceTimeCoolDown(duration); // defaul is 5 sec
             }
@@ -380,6 +381,7 @@ public class PlayerController : Photon.PunBehaviour
 
         if (currentItem == Item.SpeedUp)
         {
+            SoundManager.Instance.playSound(ESound.SpeedUp);
             speedAngle *= 1.5f;
         }
 

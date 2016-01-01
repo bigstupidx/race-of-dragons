@@ -23,6 +23,7 @@ public class MoreCoinDialogController : Singleton<MoreCoinDialogController>
 
     public void OnHide()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
     }
 

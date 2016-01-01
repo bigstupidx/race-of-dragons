@@ -19,6 +19,7 @@ public class IceAgeController : Photon.PunBehaviour
     void Start()
     {
         animator = GetComponentInChildren<Animator>();
+        SoundManager.Instance.playSound(ESound.Ice);
     }
 
     // Update is called once per frame

@@ -8,6 +8,7 @@ public class PlayerFlyState : IState<PlayerController>
     private Rigidbody2D body;
     private Vector2 vel;
     private float alpha;
+    private float timer;
 
     public PlayerFlyState() : base()
     {
@@ -26,6 +27,8 @@ public class PlayerFlyState : IState<PlayerController>
 
     public override void Begin()
     {
+        timer = 0;
+        SoundManager.Instance.playSound(ESound.Fly);
         context.textName.text = "";
         context.playerState = PlayerState.Flying;
         body = context.body;
@@ -50,7 +53,14 @@ public class PlayerFlyState : IState<PlayerController>
 
         vel = CalculateForce(context.speedAngle, alpha + speedAlpha * deltaTime);
         body.velocity = vel;
-        context.speedAngle += 2 * deltaTime;        
+        context.speedAngle += 2 * deltaTime;
+
+        timer += deltaTime;
+        if (timer >= 2)
+        {
+            timer = 0;
+            SoundManager.Instance.playSound(ESound.Eagle);
+        }  
     }
 
     public override void End()

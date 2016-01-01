@@ -5,7 +5,7 @@ public class ThunderBoostController : Photon.PunBehaviour
 {
     public float timeExist = 5;    
 
-    private float timer;
+    private float timer;    
 
 	void Start ()
     {
@@ -16,7 +16,7 @@ public class ThunderBoostController : Photon.PunBehaviour
     {
         timer += Time.deltaTime;
         if (timer >= timeExist)
-        {
+        {            
             timer = 0;
             PhotonNetwork.Destroy(this.gameObject);
         }
@@ -32,7 +32,7 @@ public class ThunderBoostController : Photon.PunBehaviour
             {
                 this.transform.parent = player.transform;
                 transform.localPosition = Vector3.zero;
-                timeExist = 1;//player.dragonPropertie.time;
+                timeExist = 1;
             }
         }
     }

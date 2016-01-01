@@ -35,6 +35,7 @@ public class ScrollListController : MonoBehaviour
 
     public void OnNext()
     {
+        SoundManager.Instance.playButtonSound();
         if (currentIndex < numOfItem - 1)
         {
             currentIndex++;            
@@ -50,6 +51,7 @@ public class ScrollListController : MonoBehaviour
         
     public void OnPrev()
     {
+        SoundManager.Instance.playButtonSound();
         if (currentIndex > 0)
         {
             currentIndex--;            

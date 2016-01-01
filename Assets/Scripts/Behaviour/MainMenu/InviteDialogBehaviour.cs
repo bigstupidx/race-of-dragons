@@ -23,11 +23,13 @@ public class InviteDialogBehaviour : MonoBehaviour
 
     public void OnCancle()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
     }
 
     public void OnAccept()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
         InviteFriendManager.roomName = roomName;
         Application.LoadLevel("Scene_Wating_Friend");

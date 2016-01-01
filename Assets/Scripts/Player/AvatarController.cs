@@ -8,7 +8,7 @@ public class AvatarController : Photon.PunBehaviour
     public Image arrow;
 
     private float mapWidth = 490.0f;
-    private float ratio = 650.0f;
+    private float ratio = 600.0f;
     private RectTransform rectTransform;
     private PhotonView playerView;
     private bool inited;
@@ -16,6 +16,11 @@ public class AvatarController : Photon.PunBehaviour
 	void Start ()
     {
         rectTransform = GetComponent<RectTransform>();
+        GameObject victory = GameObject.FindGameObjectWithTag("Victory") as GameObject;
+        if (victory != null)
+        {
+            mapWidth = victory.transform.position.x;
+        }
     }
 		
 	void Update ()

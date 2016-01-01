@@ -152,7 +152,7 @@ public class InviteFriendManager : Photon.MonoBehaviour
 
     void Update()
     {
-        if (joined)
+        if (joined && PhotonNetwork.connected)
         {
             startTime = (float)GameUtils.GetRoomCustomProperty<double>("START_TIME", 0);
             if (startTime != 0)
@@ -163,7 +163,8 @@ public class InviteFriendManager : Photon.MonoBehaviour
             if (isStartGame)
             {
                 timeCountDown = (float)(PhotonNetwork.time - startTime);
-                textCountDown.text = "Game Starting in " + (int)(GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY + 1 - timeCountDown) + "";
+                if (timeCountDown <= GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY + 1)
+                    textCountDown.text = "Game Starting in " + (int)(GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY + 1 - timeCountDown) + "";
 
                 if (timeCountDown >= GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY)
                 {
@@ -186,6 +187,7 @@ public class InviteFriendManager : Photon.MonoBehaviour
     #region UI Delegate
     public void OnBackClick()
     {
+        SoundManager.Instance.playButtonSound();
         PhotonNetwork.LeaveRoom();
         PhotonNetwork.Disconnect();
         Application.LoadLevel("Scene_MainMenu");
@@ -193,6 +195,7 @@ public class InviteFriendManager : Photon.MonoBehaviour
 
     public void OnPlayClick()
     {
+        SoundManager.Instance.playButtonSound();
         if (PhotonNetwork.isMasterClient && isStartGame == false)
         {
             isStartGame = true;
@@ -203,6 +206,7 @@ public class InviteFriendManager : Photon.MonoBehaviour
 
     public void OnInviteClick()
     {
+        SoundManager.Instance.playButtonSound();
         Instantiate(friendDialogPrefab);
     }
     #endregion

@@ -18,6 +18,7 @@ public class ToggleButtonController : MonoBehaviour
         if (isDefaultOn)
         {
             OnClick();
+            isDefaultOn = false;
         }
     }
 
@@ -25,6 +26,8 @@ public class ToggleButtonController : MonoBehaviour
     {        
         if (!isButtonOn)
         {
+            if (!isDefaultOn)
+                SoundManager.Instance.playButtonSound();
             animator.Play("Pressed", -1, 0);
             isButtonOn = true;
             contain.SetActive(true);

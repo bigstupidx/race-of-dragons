@@ -161,6 +161,8 @@ public class DragonItemController : MonoBehaviour
         if (itemInfo.Level == 5)
             return;
 
+        SoundManager.Instance.playButtonSound();
+
         if (itemInfo.useGem)
         {
             if (PlayerData.Current.gem >= itemInfo.Price)
@@ -199,6 +201,7 @@ public class DragonItemController : MonoBehaviour
     {
         if (itemInfo.IsLocked == false)
         {
+            SoundManager.Instance.playButtonSound();
             PlayerData.Current.currentDragonIndex = itemInfo.element.ToString();
             PlayerData.Current.Save();
             Reload();

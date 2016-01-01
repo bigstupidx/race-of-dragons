@@ -25,6 +25,8 @@ public class RocketController : Photon.PunBehaviour
         listParticle[rand].SetActive(true);
         particle = listParticle[rand].GetComponent<ParticleSystem>();
         particle.Play();
+
+        SoundManager.Instance.playSound(ESound.Rocket);
     }
 
     void Update()

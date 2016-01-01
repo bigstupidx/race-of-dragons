@@ -98,6 +98,7 @@ public class ItemController : MonoBehaviour
     {
         if (hasItem)
         {
+            
             animator.SetBool("isDisappear", true);
             hasItem = false;
 

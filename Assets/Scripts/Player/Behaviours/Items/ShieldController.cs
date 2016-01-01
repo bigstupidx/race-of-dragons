@@ -6,10 +6,10 @@ public class ShieldController : Photon.PunBehaviour
     public float timeExist = 5;
     public PlayerController player;
 
-    private float timer;
+    private float timer;   
 
     void Start()
-    {
+    {        
         timeExist = PlayerData.Current.items[Item.Shield.ToString()].GetDuration();
     }
 
@@ -17,7 +17,7 @@ public class ShieldController : Photon.PunBehaviour
     {
         timer += Time.deltaTime;
         if (timer >= timeExist)
-        {
+        {           
             timer = 0;
             PhotonNetwork.Destroy(this.gameObject);
             if (player != null)

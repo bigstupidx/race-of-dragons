@@ -29,6 +29,7 @@ public class MoreFriendItemController : MonoBehaviour
 
     public void OnShowInfoClick()
     {
+        SoundManager.Instance.playButtonSound();
         PlayerInfoDialogController.Instance.ShowInfo(info);
     }
 }

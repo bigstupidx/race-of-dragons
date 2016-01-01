@@ -63,6 +63,7 @@ public class MoreFriendDialogController : MonoBehaviour
 
     public void OnBackClick()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
     }
 

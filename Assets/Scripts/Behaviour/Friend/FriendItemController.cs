@@ -32,6 +32,7 @@ public class FriendItemController : MonoBehaviour
 
     public void OnShowInfoClick()
     {
+        SoundManager.Instance.playButtonSound();
         PlayerInfoDialogController.Instance.ShowInfo(info);
     }
 }

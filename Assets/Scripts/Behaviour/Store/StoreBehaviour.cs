@@ -13,6 +13,7 @@ public class StoreBehaviour : MonoBehaviour
 
 	public void OnBackClick()
     {
+        SoundManager.Instance.playButtonSound();
         PlayerData.Current.SaveOnServer();
         Application.LoadLevel("Scene_MainMenu");
     }

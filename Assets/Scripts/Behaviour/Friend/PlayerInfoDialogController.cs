@@ -55,12 +55,14 @@ public class PlayerInfoDialogController : Singleton<PlayerInfoDialogController>
 
     public void OnBackClick()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
         FriendDialogController.Instance.Reload();        
     }
 
     public void OnAddFriendClick()
     {
+        SoundManager.Instance.playButtonSound();
         animator.SetBool("isDisappear", true);
         PlayerData.Current.friendList.Add(friend.Id);
         PlayerData.Current.friends.Add(friend.Id, friend);
@@ -71,6 +73,7 @@ public class PlayerInfoDialogController : Singleton<PlayerInfoDialogController>
 
     public void OnInviteClick()
     {
+        SoundManager.Instance.playButtonSound();
         if (Application.loadedLevelName != "Scene_Wating_Friend")
         {
             InviteFriendManager.firstInviteTo = friend.Id;
