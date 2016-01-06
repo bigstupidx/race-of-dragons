@@ -8,8 +8,8 @@ using Parse;
 using System.Threading.Tasks;
 using System;
 
-public class LoginManager : MonoBehaviour {
-  
+public class LoginManager : Singleton<LoginManager>
+{  
     public InputField username;
     public InputField password;
     public Text txtInfo;
@@ -21,6 +21,8 @@ public class LoginManager : MonoBehaviour {
     
     void Awake()
     {
+        base.Awake();
+
         animator = GetComponent<Animator>();
 
         if (FB.IsInitialized)
@@ -45,7 +47,7 @@ public class LoginManager : MonoBehaviour {
     {
         var perms = new List<string>() { "public_profile", "email", "user_friends" };
         FB.LogInWithReadPermissions(perms, delegate (ILoginResult result)
-        {            
+        {
             if (FB.IsLoggedIn)
             {
                 Debug.Log("Login success");
@@ -55,7 +57,7 @@ public class LoginManager : MonoBehaviour {
             {
                 Debug.Log("FBLoginCallback: User canceled login");
             }
-        });       
+        });
     }
 
     private IEnumerator _ParseLoginWithFacebook()
@@ -95,8 +97,16 @@ public class LoginManager : MonoBehaviour {
                         userProfile["name"] = resultObject["first_name"].ToString();
                         userProfile["avatarUrl"] = "https://graph.facebook.com/" + userProfile["facebookId"] + "/picture?type=large&return_ssl_resources=1";
 
+                        GameObject loadingDialog = Instantiate(loadingDialogPrefab) as GameObject;
+                        loadingDialogBehaviour = loadingDialog.GetComponent<LoadingDialogBehaviour>();
+                        Dictionary<string, IEnumerator> listToDo = new Dictionary<string, IEnumerator>();
 
-                        StartCoroutine(_SaveUserProfile(userProfile));
+                        listToDo.Add("Get facebook info ...", _SaveUserProfile(userProfile));
+                        listToDo.Add("Sync data ...", _SyncData());
+                        listToDo.Add("Get friends list ...", _GetFriendList());
+                        listToDo.Add("Done!...", _PrepareSomeThing());
+
+                        loadingDialogBehaviour.SetUpToDoList(listToDo);                        
                     }                   
                 });
 
@@ -120,18 +130,7 @@ public class LoginManager : MonoBehaviour {
 
         while (!taskSync.IsCompleted) yield return null;
 
-        Debug.Log("Update data was successful.");
-
-
-        GameObject loadingDialog = Instantiate(loadingDialogPrefab) as GameObject;
-        loadingDialogBehaviour = loadingDialog.GetComponent<LoadingDialogBehaviour>();
-        Dictionary<string, IEnumerator> listToDo = new Dictionary<string, IEnumerator>();
-        
-        listToDo.Add("Sync data ...", _SyncData());
-        listToDo.Add("Get friends list ...", _GetFriendList());
-        listToDo.Add("Done!...", _PrepareSomeThing());
-
-        loadingDialogBehaviour.SetUpToDoList(listToDo);
+        Debug.Log("Update data was successful.");        
     }
 
 

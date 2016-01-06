@@ -37,6 +37,7 @@ public class SignUpManager : MonoBehaviour {
         else
         {
             animator.SetBool("isDisappear", true);
+            LoginManager.Instance.username.text = username.text;
         }
     }
 
@@ -78,7 +79,7 @@ public class SignUpManager : MonoBehaviour {
                         Debug.Log("Sign Up success!");
                     }
                     else
-                    {                        
+                    {
                         Debug.Log("Sign up failed!");
 
                         // Errors from Parse Cloud and network interactions

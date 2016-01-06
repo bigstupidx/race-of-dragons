@@ -33,12 +33,30 @@ public class FriendItem
         Id = data["id"].ToString();
         Name = data["name"].ToString();
         AvatarUrl = data["avatarUrl"].ToString();
-        Level = int.Parse(data["level"].ToString());
-        Rank = int.Parse(data["rank"].ToString());
+        Level = int.Parse(data["level"].ToString());        
         Played = int.Parse(data["played"].ToString());
         Win = int.Parse(data["win"].ToString());
         if (Played > 0)
             WinRate = Win / Played;
+
+        GetRank();
+    }
+
+    public void GetRank()
+    {
+        if (!string.IsNullOrEmpty(Id))
+        {
+            var param = new Dictionary<string, object>();
+            param.Add("userId", Id);
+
+            Parse.ParseCloud.CallFunctionAsync<int>("getRankOfUser", param).ContinueWith(t =>
+            {
+                if (t.IsCompleted)
+                {
+                    Rank = t.Result;
+                }
+            });
+        }
     }
 }
 

@@ -16,7 +16,12 @@ public class InitInstanceBehaviour : MonoBehaviour
     {
         PlayerData.Current.Load();
 
-        SceneManager.Instance.LoadScene(E_SCENE.Scene_MainMenu, null);
+        StartCoroutine(_LoadScene());
 	}
 
+    private IEnumerator _LoadScene()
+    {
+        yield return new WaitForSeconds(2.5f);
+        SceneManager.Instance.LoadScene(E_SCENE.Scene_MainMenu, null);
+    }
 }

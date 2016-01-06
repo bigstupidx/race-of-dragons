@@ -16,6 +16,7 @@ public class TimeCountDownController : MonoBehaviour
     {
         text.text = "Ready!";
         startTime = PhotonNetwork.time;
+        SoundManager.Instance.playSound(ESound.Ready);
 	}
 	
 	// Update is called once per frame
@@ -27,6 +28,7 @@ public class TimeCountDownController : MonoBehaviour
             if (listPlayer.Length >= PhotonNetwork.room.playerCount)
             {
                 isStartCountDown = true;
+                StartCoroutine(_PlayTickSound());
                 startTime = PhotonNetwork.time;
             }
         }
@@ -52,4 +54,16 @@ public class TimeCountDownController : MonoBehaviour
             }
         }        
 	}
+
+    private IEnumerator _PlayTickSound()
+    {
+        yield return new WaitForSeconds(1);
+        SoundManager.Instance.playSound(ESound.Tick);
+        yield return new WaitForSeconds(1);
+        SoundManager.Instance.playSound(ESound.Tick);
+        yield return new WaitForSeconds(1);
+        SoundManager.Instance.playSound(ESound.Tick);
+        yield return new WaitForSeconds(1);
+        SoundManager.Instance.playSound(ESound.Go);
+    }
 }

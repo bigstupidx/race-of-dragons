@@ -12,9 +12,9 @@ using Random = UnityEngine.Random;
 
 public class RandomMatchMaker : Photon.MonoBehaviour
 {        
-    public Text textCountDown;
-    
+    public Text textCountDown;    
     public Transform[] cardHolders;
+    public Transform backgrounds;
   
     private bool connectFailed = false;
     private bool joined = false;
@@ -28,6 +28,8 @@ public class RandomMatchMaker : Photon.MonoBehaviour
 
     private bool isStartGame;
     private float timeStart;
+
+    private GameObject player;
 
     public string ErrorDialog
     {
@@ -95,14 +97,33 @@ public class RandomMatchMaker : Photon.MonoBehaviour
         string dragonType = PlayerData.Current.CurrentDragon.element.ToString();        
 
         string dragonPrefab = dragonType + "Dragon";
-        GameObject player = PhotonNetwork.Instantiate(dragonPrefab, cardHolders[PhotonNetwork.playerList.Length - 1].position, Quaternion.identity, 0);
+        player = PhotonNetwork.Instantiate(dragonPrefab, cardHolders[PhotonNetwork.playerList.Length - 1].position, Quaternion.identity, 0);
         var playerController = player.GetComponent<PlayerController>();
         playerController.Name = PlayerData.Current.name;
         playerController.ParseId = PlayerData.Current.id;
         playerController.AvatarUrl = PlayerData.Current.avatarUrl;
 
         player.transform.parent = cardHolders[PhotonNetwork.playerList.Length - 1];
-        player.transform.localPosition = Vector3.zero;       
+        player.transform.localPosition = Vector3.zero;
+
+        string listName = GameUtils.GetRoomCustomProperty<string>("LIST_NAME", "");
+        if (listName != "")
+            listName = listName + "," + PlayerData.Current.name;
+        else
+            listName = PlayerData.Current.name;
+        GameUtils.SetRoomCustomProperty<string>("LIST_NAME", listName);
+
+        if (PhotonNetwork.isMasterClient)
+        {
+            int rand = Random.Range(0, 4);
+            GameUtils.SetRoomCustomProperty<int>("MAP_ID", rand);
+            backgrounds.GetChild(rand).gameObject.SetActive(true);
+        }
+        else
+        {
+            int mapId = GameUtils.GetRoomCustomProperty<int>("MAP_ID", 0);
+            backgrounds.GetChild(mapId).gameObject.SetActive(true);
+        }
     }
 
     public void OnPhotonInstantiate(PhotonMessageInfo info)
@@ -151,8 +172,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
 
     public void OnLeftRoom()
     {
-        Debug.Log("OnLeftRoom (local)");
-        
+        Debug.Log("OnLeftRoom (local)");        
         // back to main menu        
         //Application.LoadLevel(WaitingMenu.SceneNameMenu);
     }
@@ -172,7 +192,8 @@ public class RandomMatchMaker : Photon.MonoBehaviour
             if (PhotonNetwork.playerList.Length >= 2)
             {
                 timeCountDown = (float)(PhotonNetwork.time - timeStart);
-                textCountDown.text = "Game Starting in " + (int)(GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY + 1 - timeCountDown) + "";
+                if (timeCountDown <= GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY + 1)
+                    textCountDown.text = "Game Starting in " + (int)(GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY + 1 - timeCountDown) + "";
 
                 if (timeCountDown >= GameConsts.Instance.TIME_COUNT_DOWN_TO_PLAY)
                 {
@@ -180,8 +201,8 @@ public class RandomMatchMaker : Photon.MonoBehaviour
 
                     if (PhotonNetwork.isMasterClient)
                     {
-                        int rand = Random.Range(0, 4);
-                        GameUtils.SetRoomCustomProperty<int>("MAP_ID", rand);
+                        //int rand = Random.Range(0, 4);
+                        //GameUtils.SetRoomCustomProperty<int>("MAP_ID", rand);
                         PhotonNetwork.LoadLevel("Scene_Game");
                     }
                         
@@ -194,7 +215,7 @@ public class RandomMatchMaker : Photon.MonoBehaviour
 
     #region UI Delegate
     public void OnBackClick()
-    {
+    {                      
         SoundManager.Instance.playButtonSound();
         PhotonNetwork.LeaveRoom();
         PhotonNetwork.Disconnect();

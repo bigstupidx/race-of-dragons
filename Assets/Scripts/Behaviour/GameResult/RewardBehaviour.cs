@@ -13,7 +13,12 @@ public class RewardBehaviour : MonoBehaviour
 
 	void Start ()
     {
-        int position = (int)PhotonNetwork.player.customProperties["POSITION"];
+        int position = -1;
+        if (PhotonNetwork.player.customProperties.ContainsKey("POSITION"))
+        {
+            position = (int)PhotonNetwork.player.customProperties["POSITION"];
+        }
+        
         int goldReward = GetGoldReward(position);
         int expReward = GetExpReward(position);
         int rankReward = GetRankReward(position);
@@ -23,6 +28,9 @@ public class RewardBehaviour : MonoBehaviour
         textRankReward.text = rankReward.ToString();
 
         PlayerData.Current.elo += rankReward;
+        PlayerData.Current.played += 1;
+        if (position <= 1)
+            PlayerData.Current.win += 1;
         CoinController.Instance.SetCoins(PlayerData.Current.gold + goldReward);
         playerStatsScript.SetExpBonus(expReward);
 	}
@@ -35,6 +43,9 @@ public class RewardBehaviour : MonoBehaviour
         {
             playerCount = PhotonNetwork.room.playerCount;
         }
+
+        if (playerCount <= 1 || PhotonNetwork.offlineMode == true || position == -1)
+            return 0;
 
         switch (position)
         {
@@ -64,6 +75,9 @@ public class RewardBehaviour : MonoBehaviour
             playerCount = PhotonNetwork.room.playerCount;
         }
 
+        if (playerCount <= 1 || PhotonNetwork.offlineMode == true || position == -1)
+            return 0;
+
         switch (position)
         {
             case 1:
@@ -85,6 +99,15 @@ public class RewardBehaviour : MonoBehaviour
 
     public int GetRankReward(int position)
     {
+        int playerCount = 1;
+        if (PhotonNetwork.room != null)
+        {
+            playerCount = PhotonNetwork.room.playerCount;
+        }
+
+        if (playerCount <= 1 || PhotonNetwork.offlineMode == true || position == -1)
+            return 0;
+
         return 4 - position;
     }
 }

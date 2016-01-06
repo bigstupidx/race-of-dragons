@@ -33,8 +33,8 @@ public class PlayerInfoDialogController : Singleton<PlayerInfoDialogController>
         friend = info;
         name.text = info.Name;
         level.text = info.Level + "";
-        rank.text = info.Rank + "";
-        winrate.text = info.WinRate + "";
+        rank.text = "-";
+        winrate.text = info.WinRate + "%";
 
         if (PlayerData.Current.friendList.Contains(info.Id))
         {
@@ -50,9 +50,22 @@ public class PlayerInfoDialogController : Singleton<PlayerInfoDialogController>
         animator.SetBool("isDisappear", false);
         animator.Play("player_infor_dialog_appear", -1, 0);
 
+        StartCoroutine(_GetRank(info.Id, rank));
         StartCoroutine(GameUtils.Instance._DownloadImage(info.AvatarUrl, avatar));
     }
 
+    private IEnumerator _GetRank(string id, Text rankText)
+    {
+        var param = new Dictionary<string, object>();
+        param.Add("userId", id);
+
+        var task = ParseCloud.CallFunctionAsync<int>("getRankOfUser", param);
+
+        while (!task.IsCompleted) yield return null;
+
+        rankText.text = task.Result + "";
+    }
+    
     public void OnBackClick()
     {
         SoundManager.Instance.playButtonSound();

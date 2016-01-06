@@ -100,6 +100,7 @@ public class PlayerController : Photon.PunBehaviour
     private bool isSlow;
     private float timer;
     [HideInInspector] public bool isFinish;
+    [HideInInspector] public bool hasFinished;
 
     #region Get & Set
 
@@ -234,6 +235,14 @@ public class PlayerController : Photon.PunBehaviour
 
     void Update()
     {
+        if (victoryPos != Vector3.zero)
+        {
+            if (transform.position.x > victoryPos.x && hasFinished == false)
+            {
+                hasFinished = true;
+            }
+        }
+
         if (!controlable)
             return;
 
@@ -242,7 +251,7 @@ public class PlayerController : Photon.PunBehaviour
         {
             if (transform.position.x > victoryPos.x && isFinish == false)
             {
-                isFinish = true;                
+                isFinish = true;
 
                 GameTimeController.Instance.isStart = false;
                 string timeFinish = GameTimeController.Instance.text.text;
@@ -336,6 +345,9 @@ public class PlayerController : Photon.PunBehaviour
 
     public void UserSkill()
     {
+        if (isFinish)
+            return;
+
         if (dragonPropertie.element == Element.Fire)
         {
             GameObject fireball = PhotonNetwork.Instantiate("Fireball", skillPlaceHolder.position, skillPlaceHolder.rotation, 0) as GameObject;
@@ -362,6 +374,9 @@ public class PlayerController : Photon.PunBehaviour
 
     internal void UserItem(Item currentItem)
     {
+        if (isFinish)
+            return;
+
         Debug.Log("Use: " + currentItem.ToString());
         if (currentItem == Item.Shield)
         {

@@ -1,34 +1,53 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class NameInPlaceHolderController : MonoBehaviour
+public class NameInPlaceHolderController : Singleton<NameInPlaceHolderController>
 {
-    public int position;
-
-    private TextMesh text;
+    public TextMesh[] text;
 	
 	void Start ()
     {
-        text = GetComponent<TextMesh>();
-        text.text = "";
+        
 	}
 		
 	void Update ()
     {
-	    if (string.IsNullOrEmpty(text.text) && PhotonNetwork.connected)
+        UpdateNameList();
+    }
+
+    public void UpdateNameList()
+    {
+        if (PhotonNetwork.connected && PhotonNetwork.room != null)
         {
-            if (PhotonNetwork.playerList.Length > position)
+            int playerCount = PhotonNetwork.room.playerCount;
+            string listName = GameUtils.GetRoomCustomProperty<string>("LIST_NAME", "");
+            if (listName != "")
             {
-                string name = string.Empty;
-
-                if (PhotonNetwork.playerList[position].customProperties.ContainsKey("NAME"))
-                    name = PhotonNetwork.playerList[position].customProperties["NAME"].ToString();
-
-                if (!string.IsNullOrEmpty(name))
+                var names = listName.Split(',');
+                if (names.Length == playerCount)
                 {
-                    text.text = name.ToShortString();
+                    for (int i = 0; i < names.Length; i++)
+                    {
+                        text[i].text = names[i].ToShortString();
+                    }
                 }
-            }
+                else
+                {
+                    listName = "";
+                    for (int i = 0; i < playerCount; i++)
+                    {
+                        string name = (string)PhotonNetwork.playerList[i].customProperties["NAME"];
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            if (i < playerCount - 1)
+                                listName += name + ",";
+                            else
+                                listName += name;
+                        }                        
+                    }
+                    GameUtils.SetRoomCustomProperty<string>("LIST_NAME", listName);
+                }                
+            }                       
         }
-	}
+    }
 }

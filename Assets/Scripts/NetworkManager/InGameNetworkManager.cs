@@ -14,7 +14,7 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 
     GameObject[] listPlayer;
     bool hasChampion;
-    float timeToChangeScene = 30;
+    float timeToChangeScene = 10;
     float timer;
 
     void Awake()
@@ -59,6 +59,7 @@ public class InGameNetworkManager : Photon.MonoBehaviour
 
         GameObject victory = GameObject.FindGameObjectWithTag("Victory") as GameObject;
         playerController.victoryPos = victory.transform.position;
+        playerController.Result = 0;
 
         SoundManager.Instance.playGameBackgroundMusic();
     }
@@ -82,9 +83,13 @@ public class InGameNetworkManager : Photon.MonoBehaviour
                     position.text = GetPositionOfCurrentPlayer();
                 }
             }            
-        }    
-        
-        if (hasChampion)
+        }
+
+        int playerFinished = 0;
+        if (PhotonNetwork.connected && PhotonNetwork.room.playerCount > 1)
+            playerFinished = GameUtils.GetRoomCustomProperty<int>("FINISHED", 0);
+
+        if (playerFinished > 0 || hasChampion)
         {
             timeToChangeScene -= Time.deltaTime;
             if (timeToChangeScene <= 0)
@@ -106,13 +111,13 @@ public class InGameNetworkManager : Photon.MonoBehaviour
             var player = listPlayer[i].GetComponent<PlayerController>();
             listPosX.Add(player.PosX);
 
-            if (player.isFinish)
+            if (player.hasFinished)
                 hasChampion = true;
         }
         listPosX.Sort();
 
         int position = listPosX.Count - listPosX.IndexOf(playerController.PosX);
-
+        
         switch (position)
         {
             case 1:

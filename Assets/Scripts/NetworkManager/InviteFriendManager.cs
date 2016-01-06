@@ -14,6 +14,7 @@ public class InviteFriendManager : Photon.MonoBehaviour
     public Text textCountDown;
 
     public Transform[] cardHolders;
+    public Transform backgrounds;
 
     public GameObject playButton;
     public GameObject inviteFriendButton;
@@ -82,6 +83,14 @@ public class InviteFriendManager : Photon.MonoBehaviour
         {
             playButton.SetActive(true);
             inviteFriendButton.SetActive(true);
+            int rand = UnityEngine.Random.Range(0, 4);
+            GameUtils.SetRoomCustomProperty<int>("MAP_ID", rand);
+            backgrounds.GetChild(rand).gameObject.SetActive(true);
+        }
+        else
+        {
+            int mapId = GameUtils.GetRoomCustomProperty<int>("MAP_ID", 0);
+            backgrounds.GetChild(mapId).gameObject.SetActive(true);
         }
     }
 
@@ -172,8 +181,8 @@ public class InviteFriendManager : Photon.MonoBehaviour
 
                     if (PhotonNetwork.isMasterClient)
                     {
-                        int rand = UnityEngine.Random.Range(0, 4);
-                        GameUtils.SetRoomCustomProperty<int>("MAP_ID", rand);
+                        //int rand = UnityEngine.Random.Range(0, 4);
+                        //GameUtils.SetRoomCustomProperty<int>("MAP_ID", rand);
                         PhotonNetwork.LoadLevel("Scene_Game");
                     }
 
