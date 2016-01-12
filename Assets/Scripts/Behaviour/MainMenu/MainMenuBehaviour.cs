@@ -9,8 +9,7 @@ public class MainMenuBehaviour : MonoBehaviour
     public GameObject friendDialogPrefab;
     public GameObject loginDialogPrefab;
 
-    [Header("Sound")]
-    public AudioClip buttonClick;
+    public ExitDialogBehaviour exitDialog;
 
     private FriendDialogController friendDialog;
 
@@ -66,7 +65,10 @@ public class MainMenuBehaviour : MonoBehaviour
 
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            exitDialog.Show();
+        }
     }
 
 

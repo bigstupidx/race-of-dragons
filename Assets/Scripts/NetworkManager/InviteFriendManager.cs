@@ -79,6 +79,13 @@ public class InviteFriendManager : Photon.MonoBehaviour
         player.transform.parent = cardHolders[PhotonNetwork.playerList.Length - 1];
         player.transform.localPosition = Vector3.zero;
 
+        string listName = GameUtils.GetRoomCustomProperty<string>("LIST_NAME", "");
+        if (listName != "")
+            listName = listName + "," + PlayerData.Current.name;
+        else
+            listName = PlayerData.Current.name;
+        GameUtils.SetRoomCustomProperty<string>("LIST_NAME", listName);
+
         if (PhotonNetwork.isMasterClient)
         {
             playButton.SetActive(true);
